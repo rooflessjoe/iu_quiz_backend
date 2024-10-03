@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 // Express-Anwendung initialisieren
 const app = express();
 
-app.use(cors());
+app.use(cors('https://rooflessjoe.github.io'));
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
