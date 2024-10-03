@@ -16,7 +16,7 @@ const pool = new Pool({
 // API-Endpunkt für Daten
 app.get('/api/data', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM your_table');  // Beispiel-Query
+    const result = await pool.query('SELECT * FROM users');  // Beispiel-Query
     res.json(result.rows);  // Rückgabe der Daten als JSON
   } catch (err) {
     console.error(err);
