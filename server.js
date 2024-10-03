@@ -31,6 +31,4 @@ app.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
 
-app.use(cors({
-  origin: 'https://rooflessjoe.github.io'
-}));
+app.use(cors());
