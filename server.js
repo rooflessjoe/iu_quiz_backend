@@ -1,5 +1,6 @@
 // Importiere benötigte Module
 const express = require('express');
+const cors = require('cors');
 const { Pool } = require('pg');
 
 // Express-Anwendung initialisieren
@@ -29,3 +30,7 @@ const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable berei
 app.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
+
+app.use(cors({
+  origin: 'https://https://rooflessjoe.github.io'
+}));
