@@ -32,5 +32,5 @@ app.listen(port, () => {
 });
 
 app.use(cors({
-  origin: 'https://https://rooflessjoe.github.io'
+  origin: 'https://rooflessjoe.github.io'
 }));
