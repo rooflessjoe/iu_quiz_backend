@@ -6,6 +6,8 @@ const { Pool } = require('pg');
 // Express-Anwendung initialisieren
 const app = express();
 
+app.use(cors());
+
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
@@ -30,5 +32,3 @@ const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable berei
 app.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
-
-app.use(cors());
