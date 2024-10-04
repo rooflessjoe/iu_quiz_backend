@@ -1,9 +1,9 @@
-// Importiere benötigte Module
+// Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 
-// Express-Anwendung initialisieren
+// Express-Framework initialisieren
 const app = express();
 
 app.use(cors({ origin: 'https://rooflessjoe.github.io' }));
@@ -19,11 +19,11 @@ const pool = new Pool({
 // API-Endpunkt für Daten
 app.get('/api/data', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM users');  // Beispiel-Query
+    const result = await pool.query('SELECT * FROM users');  // Beispiel-Query, users Table wurde in der Datenbank angelegt
     res.json(result.rows);  // Rückgabe der Daten als JSON
   } catch (err) {
     console.error(err);
-    res.status(500).send('Fehler beim Abrufen der Daten');
+    res.status(500).send('Fehler beim Abrufen der Daten'); //Catch eines Fehlers beim Abruf der Daten
   }
 });
 
