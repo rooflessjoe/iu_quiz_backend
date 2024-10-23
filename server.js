@@ -8,9 +8,9 @@ const app = express();
 
 //const allowedOrigins = ['https://rooflessjoe.github.io'];
 
-const loginRouter = require('./routes/login.js');
-const userRouter = require('./routes/user.js');
-const dataRouter = require('./routes/data.js');
+const loginRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
+const dataRouter = require('./routes/data');
 
 app.use('/login', loginRouter);
 app.use('/user', userRouter);
