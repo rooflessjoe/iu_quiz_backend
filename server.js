@@ -23,7 +23,8 @@ app.use(cors({
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
   ssl: {
-    rejectUnauthorized: false  // Wichtig für Verbindungen mit SSL
+    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen
+    ca: process.env.DATABASE_SSL_CA // Optional: Füge das CA-Zertifikat hinzu, wenn erforderlich
   }
 });
 
@@ -36,6 +37,13 @@ app.get('/api/data', async (req, res) => {
     console.error(err);
     res.status(500).send('Fehler beim Abrufen der Daten'); //Catch eines Fehlers beim Abruf der Daten
   }
+});
+
+// Optional: Pool schließen, wenn die Anwendung beendet wird
+process.on('SIGINT', async () => {
+  await pool.end();
+  console.log('Datenbankverbindung geschlossen');
+  process.exit(0);
 });
 
 // Server starten
