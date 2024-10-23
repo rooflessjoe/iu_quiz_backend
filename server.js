@@ -1,14 +1,14 @@
 // Importieren benötigter Module
 const express = require('express');
-const cors = require('cors');
+//const cors = require('cors');
 const { Pool } = require('pg');
 
 // Express-Framework initialisieren
 const app = express();
 
-const allowedOrigins = ['https://rooflessjoe.github.io'];
+//const allowedOrigins = ['https://rooflessjoe.github.io'];
 
-app.use(cors({ 
+/*app.use(cors({ 
   origin: function (origin, callback) {
     // Erlaube nur Anfragen von den erlaubten Ursprüngen
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -17,7 +17,7 @@ app.use(cors({
         callback(new Error('Nicht erlaubter Ursprung'));
     }
   } 
-}));
+}));*/
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
