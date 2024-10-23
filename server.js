@@ -23,8 +23,7 @@ app.use(cors({
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
   ssl: {
-    rejectUnauthorized: true,  // Setze dies auf true für Produktionsumgebungen
-    ca: process.env.DATABASE_SSL_CA // Optional: Füge das CA-Zertifikat hinzu, wenn erforderlich
+    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen, benötigt ein Zertifikat
   }
 });
 
