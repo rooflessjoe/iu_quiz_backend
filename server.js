@@ -13,11 +13,11 @@ const userRouter = require('./routes/user');
 const dataRouter = require('./routes/data');
 
 // Server starten
-const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
+const port = 3000;  // Render stellt die PORT-Variable bereit
 
-app.use('/login', loginRouter);
-app.use('/user', userRouter);
-app.use('/data', dataRouter);
+app.use(loginRouter);
+app.use(userRouter);
+app.use(dataRouter);
 
 /*app.use(cors({ 
   origin: function (origin, callback) {
