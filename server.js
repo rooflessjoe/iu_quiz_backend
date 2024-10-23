@@ -6,13 +6,24 @@ const { Pool } = require('pg');
 // Express-Framework initialisieren
 const app = express();
 
-app.use(cors({ origin: 'https://rooflessjoe.github.io' }));
+const allowedOrigins = ['https://rooflessjoe.github.io'];
+
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Erlaube nur Anfragen von den erlaubten Ursprüngen
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+    } else {
+        callback(new Error('Nicht erlaubter Ursprung'));
+    }
+  } 
+}));
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
   ssl: {
-    rejectUnauthorized: true  // Wichtig für Verbindungen mit SSL
+    rejectUnauthorized: false  // Wichtig für Verbindungen mit SSL
   }
 });
 
