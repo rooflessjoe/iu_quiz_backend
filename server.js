@@ -12,7 +12,7 @@ app.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
   ssl: {
-    rejectUnauthorized: false  // Wichtig für Verbindungen mit SSL
+    rejectUnauthorized: true  // Wichtig für Verbindungen mit SSL
   }
 });
 
