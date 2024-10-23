@@ -25,3 +25,5 @@ app.get('/api/data', async (req, res) => {
       res.status(500).send('Fehler beim Abrufen der Daten'); //Catch eines Fehlers beim Abruf der Daten
     }
   });
+
+  module.exports = router;
