@@ -1,16 +1,16 @@
 // Importieren benötigter Module
 const express = require('express');
-const cors = require('cors');
+//const cors = require('cors');
 const { Pool } = require('pg');
 
 // Express-Framework initialisieren
 const app = express();
 
-const allowedOrigins = ['https://rooflessjoe.github.io'];
+//const allowedOrigins = ['https://rooflessjoe.github.io'];
 
-const loginRouter = require('./routes/login');
-const userRouter = require('./routes/user');
-const dataRouter = require('./routes/data');
+const loginRouter = require('./routes/login.js');
+const userRouter = require('./routes/user.js');
+const dataRouter = require('./routes/data.js');
 
 app.use('/login', loginRouter);
 app.use('/user', userRouter);
