@@ -1,7 +1,7 @@
 // Importieren benötigter Module
 const express = require('express');
 //const cors = require('cors');
-const { Pool } = require('pg');
+//const { Pool } = require('pg');
 
 // Express-Framework initialisieren
 const app = express();
@@ -11,6 +11,9 @@ const app = express();
 const loginRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const dataRouter = require('./routes/data');
+
+// Server starten
+const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
 app.use('/login', loginRouter);
 app.use('/user', userRouter);
@@ -28,12 +31,12 @@ app.use('/data', dataRouter);
 }));*/
 
 // PostgreSQL-Verbindung einrichten
-const pool = new Pool({
+/*const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
   ssl: {
     rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen, benötigt ein Zertifikat
   }
-});
+});*/
 
 // API-Endpunkt für Daten
 /*app.get('/api/data', async (req, res) => {
@@ -47,14 +50,12 @@ const pool = new Pool({
 });*/
 
 // Pool schließen, wenn die Anwendung beendet wird
-process.on('SIGINT', async () => {
+/*process.on('SIGINT', async () => {
   await pool.end();
   console.log('Datenbankverbindung geschlossen');
   process.exit(0);
-});
+});*/
 
-// Server starten
-const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 app.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });

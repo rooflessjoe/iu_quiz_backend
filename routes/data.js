@@ -1,9 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+const { Pool } = require('pg');
 
 const router = express.Router();
 
 const allowedOrigins = ['https://rooflessjoe.github.io'];
+
+// PostgreSQL-Verbindung einrichten
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
+    ssl: {
+      rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen, benötigt ein Zertifikat
+    }
+});
 
 router.use(cors({ 
   origin: function (origin, callback) {
@@ -16,7 +25,7 @@ router.use(cors({
   } 
 }));
 
-app.get('/api/data', async (req, res) => {
+router.get('/api/data', async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM users');  // Beispiel-Query, users Table wurde in der Datenbank angelegt
       res.json(result.rows);  // Rückgabe der Daten als JSON
@@ -24,6 +33,6 @@ app.get('/api/data', async (req, res) => {
       console.error(err);
       res.status(500).send('Fehler beim Abrufen der Daten'); //Catch eines Fehlers beim Abruf der Daten
     }
-  });
+});
 
-  module.exports = router;
+module.exports = router;
