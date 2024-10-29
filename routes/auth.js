@@ -26,11 +26,12 @@ router.post('/api/login', async (req, res) => {
   console.log('Übergebene Daten:', req.body);
   const { username, password } = req.body;
   try {
-    console.log(username);
+    console.log(password);
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
       const user = result.rows[0];
       console.log('Database query result:', result.rows);
       if (!user){return res.status(404).send('User not found');}
+      console.log(await bcrypt.compare(password, user.password));
       if (user && await bcrypt.compare(password, user.password)) {
           const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
           res.json({ token });
