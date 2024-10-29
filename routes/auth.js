@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const { Pool } = require('pg');
 
 //Initialisieren als Express-Komponente
 const router = express.Router();
