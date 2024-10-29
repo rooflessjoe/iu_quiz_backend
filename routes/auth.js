@@ -32,6 +32,7 @@ router.post('/api/login', async (req, res) => {
       console.log('Database query result:', result.rows);
       if (!user){return res.status(404).send('User not found');}
       console.log(await bcrypt.compare(password, user.password));
+      console.log(process.env.SECRET_KEY);
       if (user && await bcrypt.compare(password, user.password)) {
           const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
           res.json({ token });
