@@ -28,7 +28,7 @@ router.post('/api/login', async (req, res) => {
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
       const user = result.rows[0];
       if (user && await bcrypt.compare(password, user.password)) {
-          const token = jwt.sign({ username: user.username }, 'secretKey', { expiresIn: '1h' });
+          const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
           res.json({ token });
       } else {
           res.status(401).send('Invalid credentials');

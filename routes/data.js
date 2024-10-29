@@ -3,13 +3,22 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const rateLimit = require('express-rate-limit');
 
 //Initialisieren als Express-Komponente
 const router = express.Router();
 
-const staticToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+//Statischer Token bis Registrierung und Login komplett implementiert wurden
+//const staticToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
-function authenticateToken(req, res, next) {
+// Definiere die Ratenbegrenzung
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 Minute
+  max: 10, // Maximal 5 Anfragen pro Minute
+  message: "Zu viele Anfragen von dieser IP, bitte versuchen Sie es später erneut."
+});
+
+/*function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -18,21 +27,21 @@ function authenticateToken(req, res, next) {
   if (token !== staticToken) return res.sendStatus(403); // Token ungültig
 
   next();
-}
+}*/
 
-/*// Middleware zur Token-Überprüfung
+// Middleware zur Token-Überprüfung
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, 'secretKey', (err, user) => {
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) return res.sendStatus(403);
       req.user = user;
       next();
   });
-}*/
+}
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
@@ -41,6 +50,8 @@ const pool = new Pool({
       rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
     }
 });
+
+router.use(limiter);
 
 //CORS
 router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
