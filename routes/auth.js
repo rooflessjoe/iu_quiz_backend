@@ -23,8 +23,10 @@ router.use(express.json());
 
 // Login
 router.post('/api/login', async (req, res) => {
+  console.log('Übergebene Daten:', req.body);
   const { username, password } = req.body;
   try {
+    console.log(username);
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
       const user = result.rows[0];
       console.log('Database query result:', result.rows);
