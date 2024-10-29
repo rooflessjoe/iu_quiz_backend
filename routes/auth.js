@@ -17,13 +17,7 @@ const pool = new Pool({
 });
 
 //CORS
-const corsOptions = {
-  origin: 'https://rooflessjoe.github.io', // Ersetze durch die erlaubte Domain
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: 'Content-Type'
-};
-
-router.use(cors(corsOptions));
+router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
 router.use(express.json());
 
