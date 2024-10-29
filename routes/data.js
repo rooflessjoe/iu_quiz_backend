@@ -7,7 +7,20 @@ const { Pool } = require('pg');
 //Initialisieren als Express-Komponente
 const router = express.Router();
 
-// Middleware zur Token-Überprüfung
+const staticToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401); // Kein Token vorhanden
+
+  if (token !== staticToken) return res.sendStatus(403); // Token ungültig
+
+  next();
+}
+
+/*// Middleware zur Token-Überprüfung
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -19,7 +32,7 @@ function authenticateToken(req, res, next) {
       req.user = user;
       next();
   });
-}
+}*/
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
