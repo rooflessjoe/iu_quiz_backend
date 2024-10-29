@@ -19,7 +19,7 @@ const pool = new Pool({
 //CORS
 const corsOptions = {
   origin: 'https://rooflessjoe.github.io', // Ersetze durch die erlaubte Domain
-  methods: 'POST',
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: 'Content-Type'
 };
 
