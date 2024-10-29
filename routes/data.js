@@ -1,31 +1,39 @@
+// Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
+//Initialisieren als Express-Komponente
 const router = express.Router();
 
-const allowedOrigins = ['https://rooflessjoe.github.io'];
+// Middleware zur Token-Überprüfung
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, 'secretKey', (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+  });
+}
 
 // PostgreSQL-Verbindung einrichten
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
     ssl: {
-      rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen, benötigt ein Zertifikat
+      rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
     }
 });
 
-router.use(cors({ 
-  origin: function (origin, callback) {
-    // Erlaube nur Anfragen von den erlaubten Ursprüngen
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-    } else {
-        callback(new Error('Nicht erlaubter Ursprung'));
-    }
-  } 
-}));
+//CORS
+router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
-router.get('/api/data', async (req, res) => {
+//GET-API für Komunikation mit der Datenbank
+router.get('/api/data', authenticateToken, async (req, res)  => {
     try {
       const result = await pool.query('SELECT * FROM users');  // Beispiel-Query, users Table wurde in der Datenbank angelegt
       res.json(result.rows);  // Rückgabe der Daten als JSON
@@ -35,4 +43,12 @@ router.get('/api/data', async (req, res) => {
     }
 });
 
+// Pool schließen, wenn die Anwendung beendet wird
+/*process.on('SIGINT', async () => {
+  await pool.end();
+  console.log('Datenbankverbindung geschlossen');
+  process.exit(0);
+});*/
+
+//Export der Komponente für die main-Instanz in server.js
 module.exports = router;

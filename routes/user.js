@@ -1,36 +1,34 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const { Pool } = require('pg');
 
 const router = express.Router();
-const secretKey = 'geheimeschluessel';
 
-const allowedOrigins = ['https://rooflessjoe.github.io'];
+// PostgreSQL-Verbindung einrichten
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,  // Render stellt diese Umgebungsvariable bereit
+  ssl: {
+    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
+  }
+});
 
-router.use(cors({ 
-  origin: function (origin, callback) {
-    // Erlaube nur Anfragen von den erlaubten Ursprüngen
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-    } else {
-        callback(new Error('Nicht erlaubter Ursprung'));
-    }
-  } 
-}));
+router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
-router.get('/api/protected', (req, res) => {
-    const token = req.headers['authorization'];
-    if (token) {
-      jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) {
-          return res.status(401).json({ message: 'Invalid token' });
-        } else {
-          res.json({ message: 'Protected data', user: decoded.username });
-        }
-      });
-    } else {
-      res.status(401).json({ message: 'No token provided' });
-    }
+// Registrierung
+router.post('/api/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+      const result = await pool.query(
+          'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
+          [username, hashedPassword]
+      );
+      res.status(201).send(`User registered with ID: ${result.rows[0].id}`);
+  } catch (err) {
+      res.status(500).send('Error registering user');
+  }
 });
 
 module.exports = router;
