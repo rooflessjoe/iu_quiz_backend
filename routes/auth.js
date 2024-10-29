@@ -22,7 +22,7 @@ router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 router.use(express.json());
 
 // Login
-app.post('/login', async (req, res) => {
+router.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
