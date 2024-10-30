@@ -12,7 +12,7 @@ process.env.SECRET_KEY = secretKey;
 
 // Importieren von Komponenten
 const loginRouter = require('./routes/auth');
-const userRouter = require('./routes/user');
+//const userRouter = require('./routes/user');
 const dataRouter = require('./routes/data');
 
 // Express-Framework initialisieren
@@ -28,7 +28,7 @@ server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
 // Initialisieren von Komponenten
 server.use(loginRouter);
-server.use(userRouter);
+//server.use(userRouter);
 server.use(dataRouter);
 
 // Ausgabe vom Server
