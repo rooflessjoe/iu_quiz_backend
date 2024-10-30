@@ -1,3 +1,5 @@
+//Ausgabe von Benutzerdaten Test (Name + E-Mail)
+
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
@@ -11,12 +13,12 @@ const router = express.Router();
 //Statischer Token bis Registrierung und Login komplett implementiert wurden
 //const staticToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
-// Definiere die Ratenbegrenzung
+/*//Ratelimiter für den Zugriff auf die APIs
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 Minute
   max: 10, // Maximal 5 Anfragen pro Minute
   message: "Zu viele Anfragen von dieser IP, bitte versuchen Sie es später erneut."
-});
+});*/
 
 /*function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];

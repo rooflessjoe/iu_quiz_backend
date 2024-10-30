@@ -1,3 +1,5 @@
+//Authentifizierung
+
 // Importieren benötigter Module
 const express = require('express');
 const bcrypt = require('bcryptjs');
@@ -19,23 +21,24 @@ const pool = new Pool({
 //CORS
 router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
+//Registrierung der Middleware zur Verarbeitung von JSON Anfragen
 router.use(express.json());
 
 // Login
 router.post('/api/login', async (req, res) => {
-  console.log('Übergebene Daten:', req.body);
-  const { username, password } = req.body;
+
+  const { username, password } = req.body; //In req.body befinden sich die in JSON übergebene Daten
   try {
-    console.log(password);
-      const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+
+      const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); //await wartet auf die Antwort von pool.query (SQL Statement)
       const user = result.rows[0];
-      console.log('Database query result:', result.rows);
-      if (!user){return res.status(404).send('User not found');}
-      console.log(await bcrypt.compare(password, user.password));
-      console.log(process.env.SECRET_KEY);
+
+      if (!user){console.log('User not found');} //Server-interne Ausgabe, falls der User nicht existiert
+      
+      //bcrypt.compare vergleicht das gehashte Passwort in der Datenbank mit dem übergebenen Passwort in Klartext
       if (user && await bcrypt.compare(password, user.password)) {
-          const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
-          res.json({ token });
+          const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' }); //jwt.sign generiert einen Token für den jeweiligen User
+          res.json({ token }); //Token wird ans Frontend übergeben
       } else {
           res.status(401).send('Invalid credentials');
       }
