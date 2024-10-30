@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
-const rateLimit = require('express-rate-limit');
+//const rateLimit = require('express-rate-limit');
 
 //Initialisieren als Express-Komponente
 const router = express.Router();
@@ -53,7 +53,7 @@ const pool = new Pool({
     }
 });
 
-router.use(limiter);
+//router.use(limiter);
 
 //CORS
 router.use(cors({ origin: 'https://rooflessjoe.github.io' }));

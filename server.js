@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
-const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei
+const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
 // Lies den geheimen Schlüssel aus der Datei
 const secretKey = fs.readFileSync(path, 'utf8').trim();
