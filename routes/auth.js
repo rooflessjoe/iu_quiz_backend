@@ -1,4 +1,12 @@
-//Authentifizierung
+/** 
+ * Express Router für die Authentifizierung.
+ * @module routes/auth
+ * @requires express
+ * @requires bcryptjs
+ * @requires jsonwebtoken
+ * @requires CORS
+ * @requires PostgreSQL
+ */
 
 // Importieren benötigter Module
 const express = require('express');
@@ -7,7 +15,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
 
-//Initialisieren als Express-Komponente
+
 const router = express.Router();
 
 // PostgreSQL-Verbindung einrichten
@@ -24,10 +32,21 @@ router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 //Registrierung der Middleware zur Verarbeitung von JSON Anfragen
 router.use(express.json());
 
-// Login
+/**
+ * Authentifiziert einen Benutzer und gibt ein JWT zurück.
+ * @route POST /api/login
+ * @param {object} req.body - Die Anmeldedaten des Benutzers
+ * @param {string} req.body.username - Der Benutzername
+ * @param {string} req.body.password - Das Passwort
+ * @returns {object} 200 - Erfolgreiche Antwort mit JWT
+ * @returns {string} 200.token - Das JWT für den Benutzer
+ * @returns {Error} 401 - Ungültige Anmeldedaten
+ * @returns {Error} 500 - Fehler beim Anmeldevorgang
+ */
+
 router.post('/api/login', async (req, res) => {
 
-  const { username, password } = req.body; //In req.body befinden sich die in JSON übergebene Daten
+  const { username, password } = req.body;
   try {
 
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); //await wartet auf die Antwort von pool.query (SQL Statement)
@@ -38,7 +57,7 @@ router.post('/api/login', async (req, res) => {
       //bcrypt.compare vergleicht das gehashte Passwort in der Datenbank mit dem übergebenen Passwort in Klartext
       if (user && await bcrypt.compare(password, user.password)) {
           const token = jwt.sign({ username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' }); //jwt.sign generiert einen Token für den jeweiligen User
-          res.json({ token }); //Token wird ans Frontend übergeben
+          res.json({ token });
       } else {
           res.status(401).send('Invalid credentials');
       }

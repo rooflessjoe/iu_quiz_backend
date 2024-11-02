@@ -20,7 +20,7 @@ const limiter = rateLimit({
   message: "Zu viele Anfragen von dieser IP, bitte versuchen Sie es später erneut."
 });*/
 
-/*function authenticateToken(req, res, next) {
+/*function authenticateStaticToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -58,14 +58,28 @@ const pool = new Pool({
 //CORS
 router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
-//GET-API für Komunikation mit der Datenbank
+/**
+ * Holt die Benutzerdaten aus der Datenbank.
+ * @route GET /api/data
+ * @returns {object} 200 - Erfolgreiche Antwort mit Benutzerdaten
+ * @returns {Array.<User>} 200.data - Eine Liste von Benutzerdaten
+ * @returns {Error} 500 - Fehler beim Abrufen der Daten
+ */
+
+/**
+ * Ein Benutzerobjekt.
+ * @typedef {object} User
+ * @property {string} name - Der Name des Benutzers
+ * @property {string} email - Die E-Mail-Adresse des Benutzers
+ */
+
 router.get('/api/data', authenticateToken, async (req, res)  => {
     try {
-      const result = await pool.query('SELECT * FROM users');  // Beispiel-Query, users Table wurde in der Datenbank angelegt
-      res.json(result.rows);  // Rückgabe der Daten als JSON
+      const result = await pool.query('SELECT name, email FROM users');  // Beispiel-Query, users Table wurde in der Datenbank angelegt
+      res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('Fehler beim Abrufen der Daten'); //Catch eines Fehlers beim Abruf der Daten
+      res.status(500).send('Fehler beim Abrufen der Daten');
     }
 });
 
