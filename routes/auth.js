@@ -50,6 +50,7 @@ router.post('/api/login', async (req, res) => {
   try {
 
       const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); //await wartet auf die Antwort von pool.query (SQL Statement)
+      console.log(result);
       const user = result.rows[0];
 
       if (!user){console.log('User not found');} //Server-interne Ausgabe, falls der User nicht existiert
