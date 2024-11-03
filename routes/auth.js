@@ -46,7 +46,6 @@ router.use(express.json());
 
 router.post('/api/login', async (req, res) => {
   console.log(pool);
-  console.log(connectionString);
   const { username, password } = req.body;
   try {
 
