@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
-const { authenticateToken } = require('../components/auth.js').default
+const { authenticateToken } = require('../components/auth.js');
 
 /**
  * Express Router

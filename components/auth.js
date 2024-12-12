@@ -39,4 +39,4 @@ function authenticateToken(req, res, next) {
 /**
  * Export der Funktion für die Routen
  */ 
-export default { authenticateToken };
+module.exports = { authenticateToken };

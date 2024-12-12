@@ -27,7 +27,7 @@ server.disable('x-powered-by');
 
 /**
  * Server Port;
- * Wird entweder global vom Server oder manuell festgelegt.
+ * Wird entweder aus der Umgebungsvariable oder manuell festgelegt.
  */ 
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
