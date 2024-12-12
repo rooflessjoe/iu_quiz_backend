@@ -4,21 +4,31 @@ const cors = require('cors');
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
-// Lies den geheimen Schlüssel aus der Datei
+/** 
+ * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
+ */ 
 const secretKey = fs.readFileSync(path, 'utf8').trim();
 
-// Setze den geheimen Schlüssel in process.env
+/** 
+ * Umgebungsvariable für den geheimen Schlüssel auf dem Server
+ */ 
 process.env.SECRET_KEY = secretKey;
 
 // Importieren von Komponenten
-const loginRouter = require('./routes/auth');
-//const userRouter = require('./routes/user');
+const loginRouter = require('./routes/login');
 const dataRouter = require('./routes/data');
 
-// Express-Framework initialisieren
+/**
+ * Server; 
+ * Mit dem Express-Framework initialisiert.
+ */ 
 const server = express();
+server.disable('x-powered-by');
 
-// Server starten
+/**
+ * Server Port;
+ * Wird entweder global vom Server oder manuell festgelegt.
+ */ 
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
 
