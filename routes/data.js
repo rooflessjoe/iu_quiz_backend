@@ -26,7 +26,7 @@ router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
 // Abfrage von Benutzerdaten aus der Datenbank.
 router.get('/api/data', authenticateToken, async (req, res)  => {
-  //let client;
+  let client;
     try {
       //client = await pool.connect(); // Verbindung reservieren
       const result = await pool.query('SELECT name, email FROM users');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
@@ -34,11 +34,11 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
     } catch (err) {
       console.error(err);
       res.status(500).send('Fehler beim Abrufen der Daten');
-    } /*finally {
+    } finally {
       if (client) {
         client.release(); // Verbindung freigeben
       }
-    }*/
+    }
 });
 
 /**
