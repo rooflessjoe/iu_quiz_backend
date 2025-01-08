@@ -1,7 +1,7 @@
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
+//const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const { authenticateToken } = require('../components/auth.js');
 
@@ -28,7 +28,7 @@ router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 router.get('/api/data', authenticateToken, async (req, res)  => {
   let client;
     try {
-      //client = await pool.connect(); // Verbindung reservieren
+      client = await pool.connect(); // Verbindung reservieren
       const result = await pool.query('SELECT name, email FROM users');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
       res.json(result.rows);
     } catch (err) {
