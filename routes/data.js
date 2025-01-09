@@ -4,7 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const { authenticateToken } = require('../components/auth.js');
 const fs = require('fs');
-const queries = JSON.parse(fs.readFileSync('../queries.json', 'utf8'));
+const queries = require('../components/queries.json');
 /**
  * Express Router
  */
