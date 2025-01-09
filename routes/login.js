@@ -31,6 +31,7 @@ router.use(express.json());
 router.post('/api/login', async (req, res) => {
   //console.log(pool);
   const { username, password } = req.body;
+  let (queries.login.params[0]) = username;
   try {
       console.log(queries.login.params);
       const result = await pool.query(queries.login.query, queries.login.params);

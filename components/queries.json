@@ -4,6 +4,6 @@
     "data": "SELECT name, email FROM users",
     "login": {
         "query": "SELECT * FROM users WHERE username = $1",
-        "params": ["username"]
+        "params": ["{username}"]
     }
 }
