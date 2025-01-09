@@ -4,11 +4,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
+const fs = require('fs');
 
 /**
  * Express Router
  */
 const router = express.Router();
+
+const queries = JSON.parse(fs.readFileSync('../components/queries.json', 'utf8'));
 
 /** 
  * PostgreSQL-Verbindung
@@ -33,7 +36,8 @@ router.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
 
-      const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); // await wartet auf die Antwort von pool.query (SQL Statement)
+      const result = await pool.query(queries[login]);
+      //const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); // await wartet auf die Antwort von pool.query (SQL Statement)
       console.log(result);
       const user = result.rows[0];
 
