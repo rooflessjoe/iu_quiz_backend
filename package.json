@@ -12,6 +12,7 @@
       "jsonwebtoken": "9.0.2",
       "bcryptjs": "2.4.3",
       "express-rate-limit": "7.4.1",
-      "fs": "0.0.1-security"
+      "fs": "0.0.1-security",
+      "socket.io": "4.8.1"
     }
   }
