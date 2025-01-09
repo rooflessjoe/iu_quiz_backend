@@ -31,7 +31,7 @@ router.use(express.json());
 router.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-      const result = await pool.query(queries.login.query, [username]);
+      const result = await pool.query(queries.login, [username]);
       //const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); // await wartet auf die Antwort von pool.query (SQL Statement)
       const user = result.rows[0];
 
