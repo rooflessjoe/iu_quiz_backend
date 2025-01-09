@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
-const fs = require('fs');
 const queries = require('../components/queries.json');
 /**
  * Express Router
@@ -30,13 +29,13 @@ router.use(express.json());
 
 // Authentifiziert einen Benutzer und gibt ein JSON Web Token zurück.
 router.post('/api/login', async (req, res) => {
-  console.log(pool);
+  //console.log(pool);
   const { username, password } = req.body;
   try {
-
+      console.log(queries[login]);
       const result = await pool.query(queries[login]);
       //const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); // await wartet auf die Antwort von pool.query (SQL Statement)
-      console.log(result);
+      //console.log(result);
       const user = result.rows[0];
 
       if (!user){console.log('User not found');} // Server-interne Ausgabe, falls der User nicht existiert
