@@ -32,7 +32,7 @@ router.post('/api/login', async (req, res) => {
   //console.log(pool);
   const { username, password } = req.body;
   try {
-      console.log(queries[login]);
+      console.log(queries);
       const result = await pool.query(queries[login]);
       //const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]); // await wartet auf die Antwort von pool.query (SQL Statement)
       //console.log(result);
