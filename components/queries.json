@@ -2,5 +2,8 @@
     "quiz_list": "SELECT * FROM quiz",
     "quiz": "'SELECT * FROM quiz WHERE quizid = $1 AND quizname = $2', [req.query.quizID, req.query.quizName]",
     "data": "SELECT name, email FROM users",
-    "login": "SELECT * FROM users WHERE username = $1"
+    "login": {
+        "query": "SELECT * FROM users WHERE username = $1",
+        "params": ["username"]
+    }
 }
