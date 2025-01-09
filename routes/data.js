@@ -28,7 +28,7 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
   let client;
     try {
       client = await pool.connect(); // Verbindung reservieren
-      const result = await pool.query(queries[data]);
+      const result = await pool.query(queries.data);
       //const result = await pool.query('SELECT name, email FROM users');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
       res.json(result.rows);
     } catch (err) {

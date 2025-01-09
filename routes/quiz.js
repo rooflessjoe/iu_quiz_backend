@@ -28,7 +28,8 @@ router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
   let client;
     try {
       client = await pool.connect(); // Verbindung reservieren
-      const result = await pool.query('SELECT * FROM quiz');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
+      const result = await pool.query(queries.quiz_list);
+      //const result = await pool.query('SELECT * FROM quiz');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
       res.json(result.rows);
     } catch (err) {
       console.error(err);
@@ -44,7 +45,7 @@ router.get('/api/quiz', authenticateToken, async (req, res)  => {
     let client;
       try {
         client = await pool.connect(); // Verbindung reservieren
-        const result = await pool.query(queries[quiz]);
+        const result = await pool.query(queries.quiz);
         //const result = await pool.query('SELECT * FROM quiz WHERE quizid = $1 AND quizname = $2', [req.query.quizID, req.query.quizName]);  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
         res.json(result.rows);
       } catch (err) {
