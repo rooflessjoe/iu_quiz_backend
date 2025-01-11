@@ -41,7 +41,7 @@ router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
     }
 });
 
-/*router.get('/api/quiz', authenticateToken, async (req, res)  => {
+router.get('/api/quiz', authenticateToken, async (req, res)  => {
     let client;
       try {
         client = await pool.connect(); // Verbindung reservieren
@@ -56,7 +56,7 @@ router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
           client.release(); // Verbindung freigeben
         }
       }
-  });*/
+  });
 
 /**
  * Export der Komponente für die main-Instanz in server.js
