@@ -1,6 +1,7 @@
 {
     "quiz_list": "SELECT * FROM quiz",
-    "quiz": "SELECT * FROM quiz WHERE quizid = $1 AND quizname = $2",
+    "quiz": "SELECT f.frage, f.frage FROM quiz q INNER JOIN fragen f ON q.quizid = f.quizid WHERE q.quizid = $1 AND q.quizname = $2;",
+    "answers": "SELECT DISTINCT q.quizid, f.frageid, a.antwort, a.ist_richtig FROM quiz q INNER JOIN fragen f ON q.quizid = f.quizid INNER JOIN antworten a ON f.frageid = a.frageid WHERE q.quizid = $1 AND q.quizname = $2 AND a.ist_richtig = 'true'",
     "data": "SELECT name, email FROM users",
     "login": "SELECT * FROM users WHERE username = $1"
 }
