@@ -14,7 +14,11 @@ const router = express.Router();
  * PostgreSQL-Verbindung
  */
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
+  user: 'postgres',
+  host: 'localhost',
+  database: 'iu_quiz',
+  password: 'postgres',
+  port: 5432,  // Server stellt diese Umgebungsvariable bereit
     ssl: {
       require: true,
       rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
@@ -22,7 +26,7 @@ const pool = new Pool({
 });
 
 // CORS
-router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
+router.use(cors({ origin: 'http://localhost:63342' }));
 
 // Abfrage von Benutzerdaten aus der Datenbank.
 router.get('/api/data', authenticateToken, async (req, res)  => {
@@ -33,7 +37,8 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('Fehler beim Abrufen der Daten');
+      console.error('Fehler beim Abrufen der Daten:', err.message);
+      res.status(500).json({ error: 'Interner Serverfehler', details: err.message });
     } finally {
       if (client) {
         client.release(); // Verbindung freigeben

@@ -2,7 +2,13 @@
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
-const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
+const path = 'process.env'; // Pfad zur geheimen Datei auf dem Server
+require('dotenv').config();
+
+//für Websocket
+const https = require('https');
+const socketIo = require('socket.io');
+
 
 /** 
  * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
@@ -17,13 +23,16 @@ process.env.SECRET_KEY = secretKey;
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
 const dataRouter = require('./routes/data');
+//Für WebSocket
+const setupWebSocket = require('./routes/websocket');
 
 /**
  * Server; 
  * Mit dem Express-Framework initialisiert.
- */ 
-const server = express();
-server.disable('x-powered-by');
+ */
+// const server = express(); zu const app = express();
+const app = express();
+app.disable('x-powered-by');
 
 /**
  * Server Port;
@@ -31,15 +40,20 @@ server.disable('x-powered-by');
  */ 
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
+// Erstelle einen HTTP-Server für Express und WebSocket
+const server = https.createServer(app);
 
 
 // CORS
-server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
+app.use(cors({ origin: 'http://localhost:63342' }));
 
 // Initialisieren von Komponenten
-server.use(loginRouter);
+app.use(loginRouter);
 //server.use(userRouter);
-server.use(dataRouter);
+app.use(dataRouter);
+
+//Initialisieren vom WebSockets
+setupWebSocket(server);
 
 // Ausgabe vom Server
 server.listen(port, () => {
