@@ -4,6 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const { authenticateToken } = require('../components/auth.js');
 const queries = require('../components/queries.json');
+//const cors_origin = require('../components/cors_origin.json');
 /**
  * Express Router
  */
@@ -21,16 +22,14 @@ const pool = new Pool({
 });
 
 // CORS
-router.use(cors({ origin: 'https://rooflessjoe.github.io' }));
+//router.use(cors({ origin: cors_origin.origin_local }));
 
 // Abfrage von Benutzerdaten aus der Datenbank.#
 router.get('/api/data', authenticateToken, async (req, res)  => {
   let client;
     try {
       client = await pool.connect(); // Verbindung reservieren
-      const result = await pool.query(queries.quiz_list);
-      //const result = await pool.query('SELECT name, email FROM users');  // Beispiel-Query; users Tabelle wurde in der Datenbank manuell angelegt
-      console.log(result.rows);
+      const result = await pool.query(queries.data, [req.user.username]);
       res.json(result.rows);
     } catch (err) {
       console.error(err);
