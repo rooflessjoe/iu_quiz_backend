@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
-const cors_origin = require('./components/cors_origin.json');
+//const cors_origin = require('./components/cors_origin.json');
 
 /** 
  * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
