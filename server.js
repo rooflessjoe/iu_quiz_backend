@@ -11,8 +11,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const quizAPI = require('./routes/quizAPI')
 
-
-
 /**
  * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
  */
@@ -26,6 +24,7 @@ process.env.SECRET_KEY = secretKey;
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
 const dataRouter = require('./routes/data');
+const quizRouter = require('./routes/quiz');
 
 /**
  * Server;
@@ -47,7 +46,7 @@ server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
 // Initialisieren von Komponenten
 server.use(loginRouter);
-//server.use(userRouter);
+server.use(quizRouter);
 server.use(dataRouter);
 
 // HTTP-Server erstellen und mit Socket.io verbinden
