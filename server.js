@@ -24,7 +24,6 @@ process.env.SECRET_KEY = secretKey;
 const loginRouter = require('./routes/login');
 const dataRouter = require('./routes/data');
 //Für WebSocket
-const setupWebSocket = require('./routes/websocket');
 
 /**
  * Server; 
