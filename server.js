@@ -5,14 +5,23 @@ const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 //const cors_origin = require('./components/cors_origin.json');
 
-/** 
+/**
+ * Für Websockets
+ */
+const http = require('http');
+const socketIo = require('socket.io');
+const quizAPI = require('./routes/quizAPI')
+
+
+
+/**
  * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
- */ 
+ */
 const secretKey = fs.readFileSync(path, 'utf8').trim();
 
-/** 
+/**
  * Umgebungsvariable für den geheimen Schlüssel auf dem Server
- */ 
+ */
 process.env.SECRET_KEY = secretKey;
 
 // Importieren von Komponenten
@@ -21,16 +30,16 @@ const dataRouter = require('./routes/data');
 const quizRouter = require('./routes/quiz');
 
 /**
- * Server; 
+ * Server;
  * Mit dem Express-Framework initialisiert.
- */ 
+ */
 const server = express();
 server.disable('x-powered-by');
 
 /**
  * Server Port;
  * Wird entweder aus der Umgebungsvariable oder manuell festgelegt.
- */ 
+ */
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
 
@@ -42,6 +51,13 @@ server.use(cors({ origin: "https://rooflessjoe.github.io" }));
 server.use(loginRouter);
 server.use(quizRouter);
 server.use(dataRouter);
+
+// HTTP-Server erstellen und mit Socket.io verbinden
+const httpServer = http.createServer(server);
+const io = socketIo(httpServer);
+
+// WebSocket-Komponente initialisieren
+quizAPI(io); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
 server.listen(port, () => {

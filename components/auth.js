@@ -8,15 +8,15 @@ function authenticateToken(req, res, next) {
     const token = authHeader && authHeader.split(' ')[1];
   
     if (token == null) {
-      return res.sendStatus(401).send('Invalid Token');
+      return res.status(401).json({message:'Invalid Token'});
     } else {
       jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       //jwt.verify(token, '123', (err, user) => {
         if (err) {
           if (err.name === 'TokenExpiredError'){
-            return res.sendStatus(403).json({ message: 'Token abgelaufen' });
+            return res.status(403).json({ message: 'Token abgelaufen' });
           }
-            return res.sendStatus(500).send('Authentification Error');;
+            return res.status(500).json({message:'Authentification Error'});;
         }
         req.user = user;
         next();

@@ -33,7 +33,8 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('Fehler beim Abrufen der Daten');
+      console.error('Fehler beim Abrufen der Daten:', err.message);
+      res.status(500).json({ error: 'Interner Serverfehler', details: err.message });
     } finally {
       if (client) {
         client.release(); // Verbindung freigeben

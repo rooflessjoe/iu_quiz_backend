@@ -11,7 +11,7 @@ const queries = require('../components/queries.json');
  */
 const router = express.Router();
 
-/** 
+/**
  * PostgreSQL-Verbindung
  */
 const pool = new Pool({
@@ -72,5 +72,5 @@ router.post('/api/register', async (req, res) => {
 
 /**
  * Export der Komponente für die main-Instanz in server.js
- */ 
+ */
 module.exports = router;
