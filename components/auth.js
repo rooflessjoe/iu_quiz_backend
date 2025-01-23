@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 /**
  * Middleware zur Authentifizierung eines JSON Web Tokens (JWT).
  * Überprüft den Authorization-Header und validiert den Token.
@@ -10,6 +11,7 @@ function authenticateToken(req, res, next) {
       return res.sendStatus(401).send('Invalid Token');
     } else {
       jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+      //jwt.verify(token, '123', (err, user) => {
         if (err) {
           if (err.name === 'TokenExpiredError'){
             return res.sendStatus(403).json({ message: 'Token abgelaufen' });
