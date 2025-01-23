@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
+//const cors_origin = require('./components/cors_origin.json');
 
 /**
  * Für Websockets
@@ -26,6 +27,7 @@ process.env.SECRET_KEY = secretKey;
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
 const dataRouter = require('./routes/data');
+const quizRouter = require('./routes/quiz');
 
 /**
  * Server;
@@ -43,11 +45,11 @@ const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable berei
 
 
 // CORS
-server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
+server.use(cors({ origin: "https://rooflessjoe.github.io" }));
 
 // Initialisieren von Komponenten
 server.use(loginRouter);
-//server.use(userRouter);
+server.use(quizRouter);
 server.use(dataRouter);
 
 // HTTP-Server erstellen und mit Socket.io verbinden

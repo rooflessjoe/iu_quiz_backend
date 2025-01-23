@@ -1,0 +1,10 @@
+{
+    "quiz_list": "SELECT quiz_id, quiz_name FROM quiz",
+    "question_list": "SELECT f.question_id, f.question FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id WHERE q.quiz_id = $1 AND q.quiz_name = $2",
+    "answer_list": "SELECT f.question_id, a.answer_id, a.answer FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id INNER JOIN answers a ON f.question_id = a.question_id WHERE q.quiz_id = $1 AND q.quiz_name = $2",
+    "answer_valid": "SELECT a.answer_id, a.valid FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id INNER JOIN answers a ON f.question_id = a.question_id WHERE q.quiz_id = $1 AND q.quiz_name = $2 AND f.question_id = $3 AND a.valid = 'true'",
+    "data": "SELECT name, email, username FROM users WHERE username = $1",
+    "login": "SELECT username, password FROM users WHERE username = $1",
+    "register": "INSERT INTO users (name, email, username, password) VALUES ($1, $1, $1, $2) RETURNING id",
+    "add_user_token": "INSERT INTO tokens (token) VALUES ($1)"
+}

@@ -11,6 +11,7 @@ function authenticateToken(req, res, next) {
       return res.status(401).json({message:'Invalid Token'});
     } else {
       jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+      //jwt.verify(token, '123', (err, user) => {
         if (err) {
           if (err.name === 'TokenExpiredError'){
             return res.status(403).json({ message: 'Token abgelaufen' });
