@@ -7,7 +7,7 @@ require('dotenv').config();
 
 //für Websocket
 const https = require('https');
-const socketIo = require('socket.io');
+
 
 
 /** 
