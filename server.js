@@ -52,9 +52,10 @@ server.use(dataRouter);
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
 const io = socketIo(httpServer);
+const quizNamespace = io.of('/quiz')
 
 // WebSocket-Komponente initialisieren
-quizAPI(io); // Die WebSocket-Logik hier aufrufen
+quizAPI(quizNamespace); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
 server.listen(port, () => {
