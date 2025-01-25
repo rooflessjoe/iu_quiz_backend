@@ -68,3 +68,7 @@ quizAPI(quizNamespace); // Die WebSocket-Logik hier aufrufen
 httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
+
+server.listen(port, () => {
+  console.log(`Server läuft auf Port ${port}`);
+});
