@@ -51,14 +51,7 @@ server.use(dataRouter);
 
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
-const io = socketIo(httpServer, {
-  cors: {
-    origin: 'https://rooflessjoe.github.io',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['my-custom-header'],
-    credentials: true
-  }
-});
+const io = socketIo(httpServer, {cors: {origin: 'https://rooflessjoe.github.io',}});
 const quizNamespace = io.of('/quizAPI')
 
 // WebSocket-Komponente initialisieren
@@ -66,9 +59,5 @@ quizAPI(quizNamespace); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
 httpServer.listen(port, () => {
-  console.log(`Server läuft auf Port ${port}`);
-});
-
-server.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
