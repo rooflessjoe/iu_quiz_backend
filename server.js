@@ -65,6 +65,6 @@ const quizNamespace = io.of('/quizAPI')
 quizAPI(quizNamespace); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
-server.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
