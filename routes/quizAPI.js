@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 module.exports = (io) => {
     const { Pool } = require('pg');
 
@@ -11,6 +12,19 @@ module.exports = (io) => {
     pool.connect().then(() => console.log('Datenverbindung erfolgreich!')).catch((err) => console.error('Fehler bei der Verbindung:', err.stack));
 
     const ADMIN = "Admin"
+
+    //JWT Token Controlle
+    function verifyToken(token) {
+        return new Promise((resolve, reject) => {
+            jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+                if (err) {
+                    reject('Invalid token');
+                }else{
+                    resolve(decoded);
+                }
+            })
+        })
+    }
 
     //state
     const UsersState = {
@@ -76,44 +90,54 @@ module.exports = (io) => {
         socket.emit('message', buildMsg(ADMIN, "Welcome to Quiz App!"))
 
 
-        socket.on('enterRoom', ({ name, room }) => {
-            // Entfernen des Benutzers aus dem vorherigen Raum (falls vorhanden)
-            const prevRoom = getUser(socket.id)?.room;
+        socket.on('enterRoom', async ({name, room, token}) => {
+            try{
+                const decoded = await verifyToken(token);
+                console.log(decoded);
+                console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
 
-            if (prevRoom) {
-                socket.leave(prevRoom);
-                io.to(prevRoom).emit('message', buildMsg(ADMIN, `${name} has left the room`));
-            }
+                // Entfernen des Benutzers aus dem vorherigen Raum (falls vorhanden)
+                const prevRoom = getUser(socket.id)?.room;
 
-            // Benutzer im neuen Raum aktivieren
-            const user = activateUser(socket.id, name, room);
+                if (prevRoom) {
+                    socket.leave(prevRoom);
+                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${name} has left the room`));
+                }
 
-            if (prevRoom) {
-                io.to(prevRoom).emit('userList', {
-                    users: getUsersInRoom(prevRoom),
+                // Benutzer im neuen Raum aktivieren
+                const user = activateUser(socket.id, name, room);
+
+                if (prevRoom) {
+                    io.to(prevRoom).emit('userList', {
+                        users: getUsersInRoom(prevRoom),
+                    });
+                }
+
+                // Benutzer in den neuen Raum aufnehmen
+                socket.join(user.room);
+
+                RoomsState.activateRoom(user.room, 0, null, null)
+
+                // Den Benutzer informieren
+                socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
+
+                // Andere Benutzer im Raum informieren
+                socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
+
+                // Benutzerliste im neuen Raum aktualisieren
+                io.to(user.room).emit('userList', {
+                    users: getUsersInRoom(user.room),
                 });
+
+                // Räume für alle Clients aktualisieren
+                io.emit('roomList', {
+                    rooms: getAllActiveRooms(),
+                });
+            }catch (error) {
+                console.error('Token verification failed:', error);
+                socket.emit('failedToken');
+                socket.disconnect();
             }
-
-            // Benutzer in den neuen Raum aufnehmen
-            socket.join(user.room);
-
-            RoomsState.activateRoom(user.room, 0, null, null)
-
-            // Den Benutzer informieren
-            socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
-
-            // Andere Benutzer im Raum informieren
-            socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
-
-            // Benutzerliste im neuen Raum aktualisieren
-            io.to(user.room).emit('userList', {
-                users: getUsersInRoom(user.room),
-            });
-
-            // Räume für alle Clients aktualisieren
-            io.emit('roomList', {
-                rooms: getAllActiveRooms(),
-            });
         });
 
 
