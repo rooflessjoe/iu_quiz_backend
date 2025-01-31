@@ -378,13 +378,13 @@ module.exports = (io) => {
 
     async function getQuestions(category) {
         const query =  `
-        SELECT f.question_id, f.question
-        FROM fragen f
-        JOIN quiz q ON f.quiz_id = q.quiz_id
-        WHERE q.quiz_name = $1
-        ORDER BY RANDOM()
-        LIMIT 1;
-    `
+            SELECT f.question_id, f.question
+            FROM fragen f
+                     JOIN quiz q ON f.quiz_id = q.quiz_id
+            WHERE q.quiz_name = $1
+            ORDER BY RANDOM()
+                LIMIT 1;
+        `
         try{
             console.log('In der Funktion Kategory:', category)
             const result = await pool.query(query, [category])
@@ -398,9 +398,9 @@ module.exports = (io) => {
     //Function to get Answers to Questions
     async function getAnswersForQuestion(question_id) {
         const query = `
-        SELECT a.answer_id, a.answer, a.question_id
-        FROM antworten a
-        WHERE a.question_id = $1;`
+            SELECT a.answer_id, a.answer, a.question_id
+            FROM antworten a
+            WHERE a.question_id = $1;`
 
         try{
             const result = await pool.query(query, [question_id])
@@ -416,10 +416,10 @@ module.exports = (io) => {
     async function evaluateAnswer(playerAnswer, question_id) {
         try{
             const result = await pool.query(`
-            SELECT valid 
-            FROM antworten 
-            WHERE question_id = $1 AND answer_id = $2
-                `, [question_id, playerAnswer])
+                SELECT valid
+                FROM antworten
+                WHERE question_id = $1 AND answer_id = $2
+            `, [question_id, playerAnswer])
             if(result.rows.length === 0){
                 return {correct : false, message: 'Ungültige Antwort'}
             }
