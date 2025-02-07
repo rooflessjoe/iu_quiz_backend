@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const {query} = require("express");
 module.exports = (io) => {
     const { Pool } = require('pg');
 
@@ -62,12 +63,13 @@ module.exports = (io) => {
             this.rooms = newRoomsArray;
         },
         // Funktion, um einen Raum zu aktivieren oder zu aktualisieren
-        activateRoom: function(room, currentQuestion, questionCount = null, category = null) {
+        activateRoom: function(room, currentQuestion, questionCount, category) {
             const newRoom = {
                 room,
                 currentQuestion: currentQuestion || 0,  // Default to 0 if undefined
                 questionCount: questionCount,
-                category: category
+                category: category,
+                gameStatus: 'open'
             };
 
             this.setRooms([
@@ -89,23 +91,37 @@ module.exports = (io) => {
         // Upon connection - only to user
         socket.emit('message', buildMsg(ADMIN, "Welcome to Quiz App!"))
 
+        socket.emit('roomList', {
+            rooms: getAllActiveRooms(),
+        });
 
-        socket.on('enterRoom', async ({name, room, token}) => {
+
+        getCategories().then(categories => {
+            socket.emit('listOfCategories', categories);
+        }).catch(error => {
+            console.log(error);
+            socket.emit('listOfCategories', []);
+        })
+
+
+        socket.on('enterRoom', async ({room, token}) => {
             try{
                 const decoded = await verifyToken(token);
                 console.log(decoded);
                 console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
+
+                //Check ob raum existiert einfügen
 
                 // Entfernen des Benutzers aus dem vorherigen Raum (falls vorhanden)
                 const prevRoom = getUser(socket.id)?.room;
 
                 if (prevRoom) {
                     socket.leave(prevRoom);
-                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${name} has left the room`));
+                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
                 }
 
                 // Benutzer im neuen Raum aktivieren
-                const user = activateUser(socket.id, name, room);
+                const user = activateUser(socket.id, decoded.username, room);
 
                 if (prevRoom) {
                     io.to(prevRoom).emit('userList', {
@@ -115,8 +131,6 @@ module.exports = (io) => {
 
                 // Benutzer in den neuen Raum aufnehmen
                 socket.join(user.room);
-
-                RoomsState.activateRoom(user.room, 0, null, null)
 
                 // Den Benutzer informieren
                 socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
@@ -140,35 +154,97 @@ module.exports = (io) => {
             }
         });
 
+        socket.on('createRoom', async ({token, questionCount, category, room}) => {
+            try{
+                const decoded = await verifyToken(token);
+                console.log(decoded);
+                console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
 
 
-        socket.on('startQuiz', async ({ questionCount, category  }) => {
+                // Entfernen des Benutzers aus dem vorherigen Raum (falls vorhanden)
+                const prevRoom = getUser(socket.id)?.room;
+
+                if (prevRoom) {
+                    socket.leave(prevRoom);
+                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
+                }
+
+                // Benutzer im neuen Raum aktivieren
+                const user = activateUser(socket.id, decoded.username, room);
+
+                if (prevRoom) {
+                    io.to(prevRoom).emit('userList', {
+                        users: getUsersInRoom(prevRoom),
+                    });
+                }
+
+                // Benutzer in den neuen Raum aufnehmen
+                socket.join(user.room);
+
+                console.log("Prior to active:" + category)
+
+                RoomsState.activateRoom(room, 0, questionCount, category);
+
+                // Den Benutzer informieren
+                socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
+
+                // Andere Benutzer im Raum informieren
+                socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
+
+                // Benutzerliste im neuen Raum aktualisieren
+                io.to(user.room).emit('userList', {
+                    users: getUsersInRoom(user.room),
+                });
+
+                // Räume für alle Clients aktualisieren
+                io.emit('roomList', {
+                    rooms: getAllActiveRooms(),
+                });
+            }catch (error) {
+                console.error('Token verification failed:', error);
+                socket.emit('failedToken');
+                socket.disconnect();
+            }
+        })
+
+        socket.on('startQuiz', async () => {
             try {
+                const gameState = 'active'
                 const user = getUser(socket.id);
+                console.log(user);
 
                 if (!user) {
                     throw new Error('User not found');
                 }
-                const room = user.room;
+                const room = RoomsState.rooms.find(r => r.room === user.room);
                 if (!room) {
                     throw new Error('Room not found for the user');
                 }
-                console.log(`Starting quiz in room: ${room}`);
+                console.log(`Starting quiz in room: ${room.room}`);
 
-                const updatedRoom = updateRoomAttribute(room, {currentQuestion: 1, questionCount: questionCount, category: category})
-                console.log('Start Quiz:', updatedRoom);
-                console.log('currentRoom State', updatedRoom.currentQuestion)
-                const questions = await getQuestions(updatedRoom.category);
+                console.log('Start Quiz:', room);
+                console.log('currentRoom State', room.currentQuestion)
+                const questions = await getQuestions(room.category);
                 console.log('Retrieved questions:', questions);
+                const currentQuestionThisRound = room.currentQuestion + 1;
+                const updates = {
+                    currentQuestion: currentQuestionThisRound,
+                    gameStatus: gameState,
+                };
+                const updatedRoom = updateRoomAttribute(room.room, updates)
+                console.log(updatedRoom)
 
+                io.emit('roomList', {
+                    rooms: getAllActiveRooms(),
+                });
 
                 if (questions.length > 0) {
-                    io.to(room).emit('question', {
+                    io.to(room.room).emit('question', {
                         question_id: questions[0].question_id,
                         question: questions[0].question,
                     });
                 } else {
-                    console.log('No questions found for the category:', up.category);
+                    console.log('No questions found for the category:', room.category);
                 }
             } catch (err) {
                 console.error('Fehler:', err.stack);
@@ -296,6 +372,54 @@ module.exports = (io) => {
             }
         })
 
+        socket.on('leaveRoom', async () => {
+            try {
+                console.log('leave room');
+                const user = getUser(socket.id);
+                if (!user) {
+                    throw new Error('User not found');
+                }
+
+                // Entfernen des Benutzers aus dem vorherigen Raum (falls vorhanden)
+                const prevRoom = user.room;
+
+                if (prevRoom) {
+                    // Verlasse den Raum, ohne den Socket zu trennen
+                    socket.leave(prevRoom);
+
+                    UsersState.setUsers(
+                        UsersState.users.filter(u => u.id !== socket.id)
+                    );
+
+                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
+
+                    // Benutzerliste im Raum aktualisieren
+                    io.to(prevRoom).emit('userList', {
+                        users: getUsersInRoom(prevRoom),
+                    });
+
+                    // Den Benutzer über das Verlassen des Raumes informieren
+                    socket.emit('message', buildMsg(ADMIN, `You have left the room`));
+                    socket.emit('leftRoom')
+
+
+                    console.log('Users in Room after leaving:',getUsersInRoom(prevRoom))
+                    if(getUsersInRoom(prevRoom)  < 1){
+                        console.log('Room Empty')
+                        RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
+                    }
+                    io.emit('roomList', {
+                        rooms: getAllActiveRooms(),
+                    });
+                }
+
+
+            } catch (err) {
+                console.error('Fehler', err.stack);
+            }
+        });
+
+
 
         // When user disconnects - to all others
         socket.on('disconnect', () => {
@@ -371,7 +495,8 @@ module.exports = (io) => {
     }
 
     function getAllActiveRooms(){
-        return Array.from(new Set(UsersState.users.map(user => user.room)))
+        console.log(RoomsState.rooms)
+        return RoomsState.rooms
     }
 
 
@@ -454,6 +579,21 @@ module.exports = (io) => {
             throw err;
         }
 
+    }
+
+    async function getCategories(){
+        const query = `
+        SELECT DISTINCT quiz_name
+        from quiz`
+
+        try{
+            const result = await pool.query(query)
+            console.log('Abgerufene Categories:', result.rows)
+            return result.rows.map(row => row.quiz_name);
+        }catch (err){
+            console.error('Fehler beim Abruf: ', err.stack)
+            return []
+        }
     }
 
 }
