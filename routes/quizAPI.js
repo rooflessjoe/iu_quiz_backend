@@ -14,7 +14,7 @@ module.exports = (io) => {
 
     const ADMIN = "Admin"
 
-    //JWT Token Controlle
+    //JWT Token Kontrolle
     function verifyToken(token) {
         return new Promise((resolve, reject) => {
             jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
@@ -63,13 +63,15 @@ module.exports = (io) => {
             this.rooms = newRoomsArray;
         },
         // Funktion, um einen Raum zu aktivieren oder zu aktualisieren
-        activateRoom: function(room, currentQuestion, questionCount, category) {
+        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer) {
             const newRoom = {
                 room,
                 currentQuestion: currentQuestion || 0,  // Default to 0 if undefined
                 questionCount: questionCount,
                 category: category,
-                gameStatus: 'open'
+                gameStatus: 'open',
+                timerEnabled: timerEnabled,
+                timer: timer
             };
 
             this.setRooms([
@@ -154,7 +156,7 @@ module.exports = (io) => {
             }
         });
 
-        socket.on('createRoom', async ({token, questionCount, category, room}) => {
+        socket.on('createRoom', async ({token, questionCount, category, room, timerEnabled, timer}) => {
             try{
                 const decoded = await verifyToken(token);
                 console.log(decoded);
@@ -183,7 +185,11 @@ module.exports = (io) => {
 
                 console.log("Prior to active:" + category)
 
-                RoomsState.activateRoom(room, 0, questionCount, category);
+                if (!timerEnabled){
+                    timer = null;
+                }
+
+                RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer);
 
                 // Den Benutzer informieren
                 socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
@@ -239,7 +245,10 @@ module.exports = (io) => {
                 });
 
                 if (questions.length > 0) {
+                    console.log('timer:', room.timer, room.timerEnabled);
                     io.to(room.room).emit('question', {
+                        timerEnabled: room.timerEnabled,
+                        timerDuration: room.timer,
                         question_id: questions[0].question_id,
                         question: questions[0].question,
                     });
@@ -346,6 +355,8 @@ module.exports = (io) => {
 
                         console.log(questions[0].question_id, questions[0].question)
                         io.to(updatedRoom.room).emit('question',{
+                            timerEnabled: room.timerEnabled,
+                            timerDuration: room.timer,
                             question_id: questions[0].question_id,
                             question: questions[0].question,
                         })
@@ -583,8 +594,8 @@ module.exports = (io) => {
 
     async function getCategories(){
         const query = `
-        SELECT DISTINCT quiz_name
-        from quiz`
+            SELECT DISTINCT quiz_name
+            from quiz`
 
         try{
             const result = await pool.query(query)
