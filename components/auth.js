@@ -1,7 +1,16 @@
-const jwt = require('jsonwebtoken');
 /**
  * Middleware zur Authentifizierung eines JSON Web Tokens (JWT).
  * Überprüft den Authorization-Header und validiert den Token.
+ * @module JWT-Authentification
+*/
+
+const jwt = require('jsonwebtoken');
+
+/**
+ * @function authenticateToken
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @param {Function} next - Next middleware function  
 */
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -38,7 +47,4 @@ function authenticateToken(req, res, next) {
   next();
 }*/
 
-/**
- * Export der Funktion für die Routen
- */ 
-module.exports = { authenticateToken };
+module.exports = authenticateToken;
