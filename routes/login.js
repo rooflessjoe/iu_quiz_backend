@@ -7,7 +7,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const pool = require('../server');
+const { Pool } = require('pg');
 const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
 
@@ -20,13 +20,13 @@ const queries = require('../components/queries.json');
 const router = express.Router();
 
 //PostgreSQL Datenbankverbindung
-/*const pool = new Pool({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
   ssl: {
     require: true,
     rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
   }
-});*/
+});
 
 // Registrierung der Middleware zur Verarbeitung von JSON Anfragen
 router.use(express.json());

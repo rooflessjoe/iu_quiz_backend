@@ -8,7 +8,6 @@
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
-const {Pool} = require('pg');
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
@@ -57,15 +56,7 @@ server.disable('x-powered-by');
  */
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
 
-module.exports = pool;
 
 // CORS
 /**
