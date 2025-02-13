@@ -12,11 +12,11 @@ const jwt = require('jsonwebtoken');
  * @param {Object} res - Response object
  * @param {Function} next - Next middleware function  
 */
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
+async function authenticateToken(req, res, next) {
+    const authHeader = await req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
   
-    if (token == null) {
+    if (await token == null) {
       return res.sendStatus(401).send('Invalid Token');
     } else {
       jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
