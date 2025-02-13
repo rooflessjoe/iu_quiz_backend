@@ -31,6 +31,7 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
       client = await pool.connect(); // Verbindung reservieren
       const result = await pool.query(queries.data, [req.user.username]);
       res.json(result.rows);
+      return;
     } catch (err) {
       console.error(err);
       res.status(500).send('Fehler beim Abrufen der Daten');
