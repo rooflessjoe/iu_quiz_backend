@@ -12,8 +12,8 @@ const jwt = require('jsonwebtoken');
  * @param {Object} res - Response object
  * @param {Function} next - Next middleware function  
 */
-async function authenticateToken(req, res, next) {
-  async() =>{
+async function authenticateToken(next) {
+  async(req, res) => {
     const authHeader = await req.headers['authorization'];
     const token = authHeader && await authHeader.split(' ')[1];
   
