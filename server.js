@@ -8,6 +8,7 @@
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
+const {Pool} = require('pg');
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
@@ -71,6 +72,16 @@ server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 server.use(loginRouter);
 server.use(quizRouter);
 server.use(dataRouter);
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
+  }
+});
+
+module.exports = pool;
 
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
