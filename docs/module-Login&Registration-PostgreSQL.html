@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: Server</title>
+    <title>JSDoc: Namespace: PostgreSQL</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: Server</h1>
+    <h1 class="page-title">Namespace: PostgreSQL</h1>
 
     
 
@@ -28,6 +28,8 @@
 
 <header>
     
+        <h2>
+            <span class="ancestors"><a href="module-Login&Registration.html">Login&Registration</a>~</span>PostgreSQL</h2>
         
     
 </header>
@@ -36,6 +38,52 @@
     <div class="container-overview">
     
         
+            <div class="description">Erstellt einen neuen Pool für die Datenbankverbindungen.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="routes_login.js.html">routes/login.js</a>, <a href="routes_login.js.html#line23">line 23</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
 
         
     
@@ -44,16 +92,6 @@
     
 
     
-        <h3 class="subsection-title">Requires</h3>
-
-        <ul>
-            <li><a href="module-Login&Registration.html">module:Login&Registration</a></li>
-        
-            <li><a href="module-Quiz.html">module:Quiz</a></li>
-        
-            <li>module:Websockets</li>
-        </ul>
-    
 
     
 
@@ -61,13 +99,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl>
-            <dt><a href="module-Server-secretKey.html">secretKey</a></dt>
-            <dd></dd>
-        </dl>
     
 
     
@@ -75,14 +106,10 @@
 
         
             
-<h4 class="name" id="~port"><span class="type-signature">(inner, constant) </span>port<span class="type-signature"> :int</span></h4>
+<h4 class="name" id=".pool"><span class="type-signature">(static, constant) </span>pool<span class="type-signature"> :PoolConfig</span></h4>
 
 
 
-
-<div class="description">
-    Server Port;Wird entweder aus der Umgebungsvariable oder manuell festgelegt.
-</div>
 
 
 
@@ -90,7 +117,7 @@
     <ul>
         <li>
             
-<span class="param-type">int</span>
+<span class="param-type">PoolConfig</span>
 
 
         </li>
@@ -129,7 +156,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server.js.html">server.js</a>, <a href="server.js.html#line52">line 52</a>
+        <a href="routes_login.js.html">routes/login.js</a>, <a href="routes_login.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -149,37 +176,42 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
 
         
-            
+                
+<h4 class="name" id=".PoolConfig">PoolConfig</h4>
 
-    
-
-    
-    <h4 class="name" id=".useCors"><span class="type-signature">(static) </span>useCors<span class="signature">(options)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
 <div class="description">
-    Globale Middleware für CORS
+    Die Konfigurationsoptionen für den Pool.
 </div>
 
 
 
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
 
 
 
 
 
+    <h5 class="subsection-title">Properties:</h5>
 
-    <h5>Parameters:</h5>
     
 
-<table class="params">
+<table class="props">
     <thead>
     <tr>
         
@@ -201,7 +233,30 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>connectionString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Die Verbindungszeichenfolge zur Datenbank, bereitgestellt durch die Umgebungsvariable.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ssl</code></td>
             
 
             <td class="type">
@@ -217,11 +272,10 @@
 
             
 
-            <td class="description last">Die CORS-Optionen
+            <td class="description last">Die SSL-Konfigurationsoptionen.
                 <h6>Properties</h6>
-                
 
-<table class="params">
+<table class="props">
     <thead>
     <tr>
         
@@ -243,13 +297,13 @@
 
         <tr>
             
-                <td class="name"><code>origin</code></td>
+                <td class="name"><code>require</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">boolean</span>
 
 
             
@@ -259,7 +313,30 @@
 
             
 
-            <td class="description last">Die erlaubte Ursprungs-URL</td>
+            <td class="description last">Gibt an, ob SSL erforderlich ist.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rejectUnauthorized</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Gibt an, ob nicht autorisierte Zertifikate abgelehnt werden sollen.</td>
         </tr>
 
     
@@ -272,8 +349,6 @@
     
     </tbody>
 </table>
-
-
 
 
 
@@ -307,7 +382,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server.js.html">server.js</a>, <a href="server.js.html#line62">line 62</a>
+        <a href="routes_login.js.html">routes/login.js</a>, <a href="routes_login.js.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -323,23 +398,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
+            
     
 
     

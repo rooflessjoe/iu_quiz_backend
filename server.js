@@ -56,8 +56,6 @@ server.disable('x-powered-by');
  */
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
-
-
 // CORS
 /**
  * Globale Middleware für CORS
