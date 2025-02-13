@@ -6,7 +6,7 @@
 
 //Benötigte Module
 const express = require('express');
-const { Pool } = require('pg');
+const pool = require('../server');
 const authenticateToken = require('../components/auth.js');
 const queries = require('../components/queries.json');
 
@@ -40,13 +40,13 @@ const router = express.Router();
  * @type {PoolConfig}
  * @memberof module:Quiz~PostgreSQL
  */
-const pool = new Pool({
+/*const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
   ssl: {
     require: true,
     rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
   }
-});
+});*/
 
 /**
  * Route serving the list of available quizes
