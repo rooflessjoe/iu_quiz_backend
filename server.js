@@ -1,4 +1,5 @@
 /**
+ * Haupt Server Instanz 
  * @module Server
  * @requires Login&Registration
  * @requires Quiz
@@ -8,6 +9,7 @@
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
+const {Pool} = require('pg')
 const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
@@ -19,13 +21,24 @@ const multiQuiz = require('./components/websockets')
 /**
  * Geheimer Schlüssel aus der geheimen Datei auf dem Server
  * @constant {String} secretKey
+ * @namespace secretKey
+ */
+ 
+/**
+ * Liest den geheimen Schlüssel aus der Datei auf dem Server
+ * @name readFileSync
+ * @function
+ * @param {String} path - internal path on server for read file
+ * @param {String} encoding - Zeichenkodierung, die verwendet werden soll.
+ * @returns {String} Inhalt der Datei.
+ * @memberof module:Server~secretKey
  */
 const secretKey = fs.readFileSync(path, 'utf8').trim();
 
 /**
  * Umgebungsvariable für den geheimen Schlüssel auf dem Server
  * @name SECRET_KEY
- * @see secretKey
+ * @memberof module:Server~secretKey
  */
 process.env.SECRET_KEY = secretKey;
 
@@ -63,6 +76,14 @@ server.use(loginRouter);
 server.use(quizRouter);
 server.use(dataRouter);
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
+  }
+});
+
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
 const io = socketIo(httpServer, 
@@ -81,3 +102,5 @@ multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
 httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
+
+module.exports = pool;
