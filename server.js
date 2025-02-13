@@ -1,5 +1,4 @@
 /**
- * Haupt Server Instanz 
  * @module Server
  * @requires Login&Registration
  * @requires Quiz
@@ -13,9 +12,9 @@ const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
 //Für Websockets
-//const http = require('http');
-//const socketIo = require('socket.io');
-//const multiQuiz = require('./components/websockets')
+const http = require('http');
+const socketIo = require('socket.io');
+const multiQuiz = require('./components/websockets')
 
 /**
  * Geheimer Schlüssel aus der geheimen Datei auf dem Server
@@ -62,7 +61,7 @@ const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable berei
 // CORS
 /**
  * Globale Middleware für CORS
- * @name userCors
+ * @name useCors
  * @function
  * @param {Object} options - Die CORS-Optionen
  * @param {String} options.origin - Die erlaubte Ursprungs-URL
@@ -76,8 +75,8 @@ server.use(quizRouter);
 server.use(dataRouter);
 
 // HTTP-Server erstellen und mit Socket.io verbinden
-const httpServer = createServer(server);
-/*const io = socketIo(httpServer, 
+const httpServer = http.createServer(server);
+const io = socketIo(httpServer, 
   {
     cors: 
     {
@@ -87,9 +86,11 @@ const httpServer = createServer(server);
 const quizNamespace = io.of('/multi_quiz')
 
 // WebSocket-Komponente initialisieren
-multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen*/
+multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
 httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
+
+module.exports = pool;

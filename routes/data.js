@@ -1,7 +1,8 @@
 // Importieren benötigter Module
 const express = require('express');
+const cors = require('cors');
 const { Pool } = require('pg');
-const { authenticateToken } = require('../components/auth.js');
+const authenticateToken = require('../components/auth.js');
 const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
 /**
@@ -41,6 +42,7 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
 });
 
 /**
+ * @module DataInterface
  * Export der Komponente für die main-Instanz in server.js
  */ 
 module.exports = router;
