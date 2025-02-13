@@ -85,7 +85,7 @@ const pool = new Pool({
 });
 
 // HTTP-Server erstellen und mit Socket.io verbinden
-const httpServer = http.createServer(server);
+const httpServer = createServer(server);
 /*const io = socketIo(httpServer, 
   {
     cors: 
