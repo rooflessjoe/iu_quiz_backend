@@ -73,16 +73,6 @@ server.use(loginRouter);
 server.use(quizRouter);
 server.use(dataRouter);
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
-
-module.exports = pool;
-
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
 const io = socketIo(httpServer, 

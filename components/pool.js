@@ -4,6 +4,26 @@
 
 const {Pool} = require('pg');
 
+/**
+ * Erstellt einen neuen Pool für die Datenbankverbindungen.
+ * @constant {Pool} pool - Der Pool für die Datenbankverbindungen.
+ * @namespace PostgreSQL
+ */
+
+/**
+ * Die Konfigurationsoptionen für den Pool.
+ * @typedef {Object} PoolConfig
+ * @property {string} connectionString - Die Verbindungszeichenfolge zur Datenbank, bereitgestellt durch die Umgebungsvariable.
+ * @property {Object} ssl - Die SSL-Konfigurationsoptionen.
+ * @property {boolean} ssl.require - Gibt an, ob SSL erforderlich ist.
+ * @property {boolean} ssl.rejectUnauthorized - Gibt an, ob nicht autorisierte Zertifikate abgelehnt werden sollen.
+ * @memberof module:PostgreSQL
+ */
+
+/**
+ * @type {PoolConfig}
+ * @memberof module:PostgreSQL
+ */
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
   ssl: {

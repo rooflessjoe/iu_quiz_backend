@@ -7,7 +7,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const pool = require('../components/pool');
 const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
 
@@ -18,36 +18,6 @@ const queries = require('../components/queries.json');
  * @namespace loginRouter
  */
 const router = express.Router();
-
-//PostgreSQL Datenbankverbindung
-
-/**
- * Erstellt einen neuen Pool für die Datenbankverbindungen.
- * @constant {Pool} pool - Der Pool für die Datenbankverbindungen.
- * @namespace PostgreSQL
- */
-
-/**
- * Die Konfigurationsoptionen für den Pool.
- * @typedef {Object} PoolConfig
- * @property {string} connectionString - Die Verbindungszeichenfolge zur Datenbank, bereitgestellt durch die Umgebungsvariable.
- * @property {Object} ssl - Die SSL-Konfigurationsoptionen.
- * @property {boolean} ssl.require - Gibt an, ob SSL erforderlich ist.
- * @property {boolean} ssl.rejectUnauthorized - Gibt an, ob nicht autorisierte Zertifikate abgelehnt werden sollen.
- * @memberof module:Login&Registration~PostgreSQL
- */
-
-/**
- * @type {PoolConfig}
- * @memberof module:Login&Registration~PostgreSQL
- */
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
 
 // Registrierung der Middleware zur Verarbeitung von JSON Anfragen
 router.use(express.json());
