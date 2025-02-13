@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
 //Für Websockets
-const http = require('http');
+//const http = require('http');
 //const socketIo = require('socket.io');
 //const multiQuiz = require('./components/websockets')
 
