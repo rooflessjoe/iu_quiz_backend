@@ -92,5 +92,3 @@ multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
 httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
-
-module.exports = pool;
