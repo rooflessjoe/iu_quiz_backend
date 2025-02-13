@@ -15,7 +15,7 @@ const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Serve
 
 //Für Websockets
 const http = require('http');
-const socketIo = require('socket.io');
+//const socketIo = require('socket.io');
 //const multiQuiz = require('./components/websockets')
 
 /**
@@ -93,10 +93,10 @@ const httpServer = http.createServer(server);
       origin: 'https://rooflessjoe.github.io',
     }
   });
-const quizNamespace = io.of('/multi_quiz')*/
+const quizNamespace = io.of('/multi_quiz')
 
 // WebSocket-Komponente initialisieren
-multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
+multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen*/
 
 // Ausgabe vom Server
 httpServer.listen(port, () => {
