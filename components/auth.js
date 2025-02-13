@@ -26,7 +26,7 @@ function authenticateToken(req, res, next) {
           if (err.name === 'TokenExpiredError'){
             res.sendStatus(403).json({ message: 'Token abgelaufen' });
           }
-            res.sendStatus(500).send('Authentification Error');
+            res.status(500).send('Authentification Error');
         }
         req.user = user;
         next();
