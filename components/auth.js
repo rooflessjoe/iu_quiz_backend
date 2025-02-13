@@ -13,8 +13,9 @@ const jwt = require('jsonwebtoken');
  * @param {Function} next - Next middleware function  
 */
 async function authenticateToken(req, res, next) {
+  async() =>{
     const authHeader = await req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = authHeader && await authHeader.split(' ')[1];
   
     if (await token == null) {
       return res.sendStatus(401).send('Invalid Token');
@@ -32,6 +33,7 @@ async function authenticateToken(req, res, next) {
     });
     }
   }
+}
 
 //Statischer Token bis Registrierung und Login komplett implementiert wurden
 //const staticToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWF0IjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
