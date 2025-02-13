@@ -1,7 +1,6 @@
 // Importieren benötigter Module
 const express = require('express');
-const cors = require('cors');
-const pool = require('../server');
+const pool = require('../components/pool.js');
 const { authenticateToken } = require('../components/auth.js');
 const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
