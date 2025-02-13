@@ -1,5 +1,6 @@
 /** 
- * PostgreSQL-Verbindung
+ * Middleware für PostgreSQL-Datenbankverbindung
+ * @module PostgreSQL
  */
 
 const {Pool} = require('pg');
@@ -7,7 +8,6 @@ const {Pool} = require('pg');
 /**
  * Erstellt einen neuen Pool für die Datenbankverbindungen.
  * @constant {Pool} pool - Der Pool für die Datenbankverbindungen.
- * @namespace PostgreSQL
  */
 
 /**
@@ -30,6 +30,7 @@ const pool = new Pool({
     require: true,
     rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
   }
+  //idleTimeoutMillis: 5000, // Zeit in Millisekunden, bevor eine inaktive Verbindung geschlossen wird
 });
 
 module.exports = pool;
