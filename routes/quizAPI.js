@@ -1,8 +1,4 @@
-//ToDo
-//Check when a user gets remove from socket and room (leftRoom, join scoket and disconnect)
-
 const jwt = require("jsonwebtoken");
-const {query} = require("express");
 module.exports = (io) => {
     const { Pool } = require('pg');
     //Database connection
@@ -78,7 +74,7 @@ module.exports = (io) => {
             this.rooms = newRoomsArray;
         },
 
-        //creates a room with its setting or updates a room and removes the room with the same name to dont have duplicate rooms
+        //creates a room with its setting or updates a room and removes the room with the same name to don't have duplicate rooms
         activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer) {
             const newRoom = {
                 room,
@@ -127,46 +123,9 @@ module.exports = (io) => {
         // when user enters a room
         socket.on('enterRoom', async ({room, token}) => {
             try{
-                //checks if user is logged in
-                const decoded = await verifyToken(token);
-                console.log(decoded);
-                console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
+                const user = await addUserToRoom(socket, room, token);
 
-                // Remove user from previous room
-                const prevRoom = getUser(socket.id)?.room;
-                if (prevRoom) {
-                    socket.leave(prevRoom);
-                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
-                }
-
-                // activate user in new room
-                const user = activateUser(socket.id, decoded.username, room);
-
-                // emit update list of users in Old room to the old room
-                if (prevRoom) {
-                    io.to(prevRoom).emit('userList', {
-                        users: getUsersInRoom(prevRoom),
-                    });
-                }
-
-                // Add user to new room
-                socket.join(user.room);
-
-                // Message to user that he joined a room
-                socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
-
-                // Message to users in room that user joined
-                socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
-
-                // updates list of users in new room
-                io.to(user.room).emit('userList', {
-                    users: getUsersInRoom(user.room),
-                });
-
-                // updates List of active rooms for all users
-                io.emit('roomList', {
-                    rooms: getAllActiveRooms(),
-                });
+                await userJoinsRoom(socket, user);
             }catch (error) {
                 //if token fails emit 'failedToken' and disconnect user from websocket
                 console.error('Token verification failed:', error);
@@ -178,33 +137,9 @@ module.exports = (io) => {
         // when user creates a room
         socket.on('createRoom', async ({token, questionCount, category, room, timerEnabled, timer}) => {
             try{
-                //checks if user is logged in
-                const decoded = await verifyToken(token);
-                console.log(decoded);
-                console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
+                const user = await addUserToRoom(socket, token, room)
 
-
-                // Remove user from previous room
-                const prevRoom = getUser(socket.id)?.room;
-                if (prevRoom) {
-                    socket.leave(prevRoom);
-                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
-                }
-
-                // activate user in new room
-                const user = activateUser(socket.id, decoded.username, room);
-
-                //emit update list of users in Old room to the old room
-                if (prevRoom) {
-                    io.to(prevRoom).emit('userList', {
-                        users: getUsersInRoom(prevRoom),
-                    });
-                }
-
-                // Add user to new room
-                socket.join(user.room);
-
-                // sets timer to 'null' when timer isnt in use
+                // sets timer to 'null' when timer isn't in use
                 if (!timerEnabled){
                     timer = null;
                 }
@@ -212,21 +147,7 @@ module.exports = (io) => {
                 // activates room with given parameters
                 RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer);
 
-                // Message to user that he joined a room
-                socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
-
-                // Message to users in room that user joined
-                socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
-
-                // updates list of users in new room
-                io.to(user.room).emit('userList', {
-                    users: getUsersInRoom(user.room),
-                });
-
-                // updates List of active rooms for all users
-                io.emit('roomList', {
-                    rooms: getAllActiveRooms(),
-                });
+                await userJoinsRoom(socket, user);
             }catch (error) {
                 //if token fails emit 'failedToken' and disconnect user from websocket
                 console.error('Token verification failed:', error);
@@ -244,11 +165,11 @@ module.exports = (io) => {
                 // find user to find the room
                 const user = getUser(socket.id);
                 if (!user) {
-                    throw new Error('User not found');
+                    new Error('User not found');
                 }
                 const room = RoomsState.rooms.find(r => r.room === user.room);
                 if (!room) {
-                    throw new Error('Room not found for the user');
+                    new Error('Room not found for the user');
                 }
 
                 console.log(`Starting quiz in room: ${room.room}`);
@@ -259,12 +180,12 @@ module.exports = (io) => {
                 // increases current question for room
                 const currentQuestionThisRound = room.currentQuestion + 1;
 
-                //creates an update object and updates the room with new gameStatus and currentquestion
+                //creates an update object and updates the room with new gameStatus and currentQuestion
                 const updates = {
                     currentQuestion: currentQuestionThisRound,
                     gameStatus: gameState,
                 };
-                const updatedRoom = updateRoomAttribute(room.room, updates)
+                updateRoomAttribute(room.room, updates)
 
                 // emits new Room list to all clients
                 io.emit('roomList', {
@@ -296,11 +217,11 @@ module.exports = (io) => {
                 // find user to find the room
                 const user = getUser(socket.id);
                 if (!user) {
-                    throw new Error('User not found');
+                    new Error('User not found');
                 }
                 const room = user.room;
                 if (!room) {
-                    throw new Error('Room not found for the user');
+                    new Error('Room not found for the user');
                 }
 
                 // database request to get the Answers for the Question
@@ -324,11 +245,11 @@ module.exports = (io) => {
                 // find user to find the room
                 const user = getUser(socket.id);
                 if (!user) {
-                    throw new Error('User not found');
+                    new Error('User not found');
                 }
                 const room = RoomsState.rooms.find(r => r.room === user.room);
                 if (!room) {
-                    throw new Error('Room not found');
+                    new Error('Room not found');
                 }
 
                 // updates user to set answered true
@@ -350,7 +271,7 @@ module.exports = (io) => {
                     UsersState.updateUserScore(user.id, 10)
 
                 }
-                // gets updated user object to get new Score to emit score and validated answer to room to room
+                // gets updated user object to get new Score to emit score and validated answer to room
                 const updatedUser = getUser(socket.id)
                 const score = updatedUser.score
                 socket.emit('evaluatedAnswer', {correct, message, score})
@@ -366,11 +287,11 @@ module.exports = (io) => {
                 // finds user to find room
                 const user = getUser(socket.id);
                 if (!user) {
-                    throw new Error('User not found');
+                    new Error('User not found');
                 }
                 const room = RoomsState.rooms.find(r => r.room === user.room);
                 if (!room) {
-                    throw new Error('Room not found');
+                    new Error('Room not found');
                 }
 
                 // checks if all players have answered
@@ -419,7 +340,6 @@ module.exports = (io) => {
                 }else {
                     // if not everyone has answered, ends here and waits for last person to answer
                     console.log('Noch nicht alle Nutzer haben geantwortet');
-                    return;
                 }
             }catch(err){
                 console.error('Fehler', err.stack)
@@ -432,7 +352,7 @@ module.exports = (io) => {
                 //find user
                 const user = getUser(socket.id);
                 if (!user) {
-                    throw new Error('User not found');
+                    new Error('User not found');
                 }
 
                 // removes user from room
@@ -441,7 +361,6 @@ module.exports = (io) => {
                 if (prevRoom) {
                     // leaves room without disconnecting from socket
                     socket.leave(prevRoom);
-
 
                     UsersState.setUsers(
                         UsersState.users.filter(u => u.id !== socket.id)
@@ -463,7 +382,7 @@ module.exports = (io) => {
                     // checks if room is empty after user left
                     if(getUsersInRoom(prevRoom)  < 1){
                         console.log('Room Empty')
-                        // removes room from Roomstate if empty
+                        // removes room from RoomState if empty
                         RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
                     }
                     //emits new activeRoom list
@@ -480,7 +399,7 @@ module.exports = (io) => {
 
         // When user disconnects - to all others
         socket.on('disconnect', () => {
-            //get user and excute function to leaveApp on disconnect
+            //get user and execute function to leaveApp on disconnect
             const user = getUser(socket.id)
             userLeavesApp(socket.id)
 
@@ -547,7 +466,7 @@ module.exports = (io) => {
         return user
     }
 
-    //function if a user Leaves the App, resets the score and removes user from Userstate
+    //function if a user Leaves the App, resets the score and removes user from UserState
     function userLeavesApp(id){
         UsersState.resetUserScore(id)
         UsersState.setUsers(
@@ -578,13 +497,13 @@ module.exports = (io) => {
             throw new Error(`Room "${room}" not found`);
         }
 
-        // Creates an updated roomObejct
+        // Creates an updated roomObject
         const updatedRoom = {
             ...existingRoom, // keeps existing attributes
             ...updates       // overwrites some with new
         };
 
-        // updates room in roomstate
+        // updates room in roomState
         RoomsState.setRooms([
             ...RoomsState.rooms.filter(r => r.room !== room), // removes old room
             updatedRoom                                      // adds updated room
@@ -604,7 +523,7 @@ module.exports = (io) => {
                 LIMIT 1;
         `
         try{
-            console.log('In der Funktion Kategory:', category)
+            console.log('In der Funktion Kategorie:', category)
             const result = await pool.query(query, [category])
             console.log('Abgerufene Fragen:', result.rows);
             return result.rows;
@@ -658,13 +577,61 @@ module.exports = (io) => {
             from quiz`
 
         try{
-            const result = await pool.query(query)
-            console.log('Abgerufene Categories:', result.rows)
-            return result.rows.map(row => row.quiz_name);
+            const { rows } = await pool.query(query)
+            console.log('Abgerufene Categories:', rows)
+            return rows.map(({quiz_name}) => quiz_name);
         }catch (err){
             console.error('Fehler beim Abruf: ', err.stack)
             return []
         }
     }
 
+    async function addUserToRoom(socket, token, room) {
+        //checks if user is logged in
+        const decoded = await verifyToken(token);
+        console.log(decoded);
+        console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
+
+
+        // Remove user from previous room
+        const prevRoom = getUser(socket.id)?.room;
+        if (prevRoom) {
+            socket.leave(prevRoom);
+            io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
+        }
+
+        // activate user in new room
+        const user = activateUser(socket.id, decoded.username, room);
+
+        //emit update list of users in Old room to the old room
+        if (prevRoom) {
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom),
+            });
+        }
+
+        // Add user to new room
+        socket.join(user.room);
+
+        return user;
+    }
+
+    async function userJoinsRoom(socket, user){
+        // Message to user that he joined a room
+        socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
+
+        // Message to users in room that user joined
+        socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
+
+        // updates list of users in new room
+        io.to(user.room).emit('userList', {
+            users: getUsersInRoom(user.room),
+        });
+
+        // updates List of active rooms for all users
+        io.emit('roomList', {
+            rooms: getAllActiveRooms(),
+        });
+
+    }
 }
