@@ -395,6 +395,16 @@ module.exports = (io) => {
             }
         });
 
+        socket.on('getQuestionCount', async ({category})=>{
+            try {
+                console.log(category);
+                const count = await getQuestionCountFromDB(category);
+                socket.emit('questionCountForCategory', {count: count})
+            }catch (err){
+                console.error('Fehler', err.stack)
+            }
+        })
+
 
 
         // When user disconnects - to all others
@@ -632,6 +642,21 @@ module.exports = (io) => {
         io.emit('roomList', {
             rooms: getAllActiveRooms(),
         });
+
+    }
+    async function getQuestionCountFromDB(category){
+        const query = `
+            SELECT COUNT(*) AS count
+            FROM fragen
+            WHERE quiz_id = (
+                SELECT quiz_id
+                FROM quiz
+                WHERE quiz_name = $1
+            );`
+        const result = await pool.query(query, [category]);
+        console.log('Abgerufene Count:', result.rows[0].count);
+        return result.rows[0].count;
+
 
     }
 }
