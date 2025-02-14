@@ -1,5 +1,5 @@
 //ToDo
-//Check when a user gets remove from socket and room (leftRoom, join scoket and disconnect
+//Check when a user gets remove from socket and room (leftRoom, join scoket and disconnect)
 
 const jwt = require("jsonwebtoken");
 const {query} = require("express");
@@ -87,7 +87,8 @@ module.exports = (io) => {
                 category: category,
                 gameStatus: 'open',
                 timerEnabled: timerEnabled,
-                timer: timer
+                timer: timer,
+                playerAnswersArray: {}
             };
 
             this.setRooms([
@@ -98,6 +99,7 @@ module.exports = (io) => {
             return newRoom;
         }
     };
+
 
 
     io.on('connection', socket => {
@@ -273,6 +275,8 @@ module.exports = (io) => {
                 if (questions.length > 0) {
                     console.log('timer:', room.timer, room.timerEnabled);
                     io.to(room.room).emit('question', {
+                        currentQuestion: currentQuestionThisRound,
+                        questionCount: room.questionCount,
                         timerEnabled: room.timerEnabled,
                         timerDuration: room.timer,
                         question_id: questions[0].question_id,
@@ -334,6 +338,13 @@ module.exports = (io) => {
                 // checks the answer of the user
                 const {correct, message} = await evaluateAnswer(playerAnswer, question_id);
 
+                //checks if user is in playerAnswersArray and adds user if not
+                if (!room.playerAnswersArray[user.name]){
+                    room.playerAnswersArray[user.name] = [];
+                }
+                //adds users Answer to array
+                room.playerAnswersArray[user.name].push(correct);
+
                 // adds 10 points to score of user if answer is right
                 if(correct){
                     UsersState.updateUserScore(user.id, 10)
@@ -383,6 +394,8 @@ module.exports = (io) => {
 
                         // emits question to room
                         io.to(updatedRoom.room).emit('question',{
+                            currentQuestion: currentQuestionThisRound,
+                            questionCount: room.questionCount,
                             timerEnabled: room.timerEnabled,
                             timerDuration: room.timer,
                             question_id: questions[0].question_id,
@@ -399,8 +412,9 @@ module.exports = (io) => {
                             name: u.name,
                             score: u.score
                         }))
+                        const gameAnswersArray = room.playerAnswersArray;
 
-                        io.to(room.room).emit('quizOver', userScores)
+                        io.to(room.room).emit('quizOver', userScores, gameAnswersArray);
                     }
                 }else {
                     // if not everyone has answered, ends here and waits for last person to answer
