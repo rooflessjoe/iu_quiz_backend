@@ -647,7 +647,7 @@ module.exports = (io) => {
     async function getQuestionCountFromDB(category){
         const query = `
             SELECT COUNT(*) AS count
-            FROM fragen
+            FROM questions
             WHERE quiz_id = (
                 SELECT quiz_id
                 FROM quiz
