@@ -137,7 +137,7 @@ module.exports = (io) => {
         // when user creates a room
         socket.on('createRoom', async ({token, questionCount, category, room, timerEnabled, timer}) => {
             try{
-                const user = await addUserToRoom(socket, token, room)
+                const user = await addUserToRoom(socket, room, token)
 
                 // sets timer to 'null' when timer isn't in use
                 if (!timerEnabled){
@@ -526,7 +526,7 @@ module.exports = (io) => {
     async function getQuestions(category) {
         const query =  `
             SELECT f.question_id, f.question
-            FROM fragen f
+            FROM questions f
                      JOIN quiz q ON f.quiz_id = q.quiz_id
             WHERE q.quiz_name = $1
             ORDER BY RANDOM()
@@ -547,7 +547,7 @@ module.exports = (io) => {
     async function getAnswersForQuestion(question_id) {
         const query = `
             SELECT a.answer_id, a.answer, a.question_id
-            FROM antworten a
+            FROM answers a
             WHERE a.question_id = $1;`
 
         try{
@@ -565,7 +565,7 @@ module.exports = (io) => {
         try{
             const result = await pool.query(`
                 SELECT valid
-                FROM antworten
+                FROM answers
                 WHERE question_id = $1 AND answer_id = $2
             `, [question_id, playerAnswer])
             if(result.rows.length === 0){
@@ -596,7 +596,7 @@ module.exports = (io) => {
         }
     }
 
-    async function addUserToRoom(socket, token, room) {
+    async function addUserToRoom(socket, room, token) {
         //checks if user is logged in
         const decoded = await verifyToken(token);
         console.log(decoded);
