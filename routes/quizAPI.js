@@ -547,7 +547,7 @@ module.exports = (io) => {
     async function getAnswersForQuestion(question_id) {
         const query = `
             SELECT a.answer_id, a.answer, a.question_id
-            FROM antworten a
+            FROM answers a
             WHERE a.question_id = $1;`
 
         try{
@@ -565,7 +565,7 @@ module.exports = (io) => {
         try{
             const result = await pool.query(`
                 SELECT valid
-                FROM antworten
+                FROM answers
                 WHERE question_id = $1 AND answer_id = $2
             `, [question_id, playerAnswer])
             if(result.rows.length === 0){
