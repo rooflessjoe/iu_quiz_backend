@@ -526,7 +526,7 @@ module.exports = (io) => {
     async function getQuestions(category) {
         const query =  `
             SELECT f.question_id, f.question
-            FROM fragen f
+            FROM questions f
                      JOIN quiz q ON f.quiz_id = q.quiz_id
             WHERE q.quiz_name = $1
             ORDER BY RANDOM()
