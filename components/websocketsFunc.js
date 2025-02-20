@@ -1,5 +1,74 @@
     const { verifyToken } = require ("./auth");
     //function to build Messages with name, text and time
+
+    const UsersState = {
+        //array which saves the users
+        users: [],
+
+        //replaces users array with a new users array
+        setUsers: function(newUsersArray) {
+            this.users = newUsersArray;
+        },
+        //updates the users Status if they answered a question
+        updateUserStatus: function(id, status) {
+            this.users = this.users.map(user =>
+                user.id === id ? { ...user, answered: status } : user
+            );
+        },
+        // updates users score
+        updateUserScore: function(id, score) {
+            this.users = this.users.map(user =>
+                user.id === id ? { ...user, score: (user.score || 0) + score } : user
+            );
+        },
+        // set the users Score back to 0
+        resetUserScore: function(id) {
+            this.users = this.users.map(user =>
+                user.id === id ? { ...user, score: 0 } : user
+            );
+        },
+        // filters users in a given room
+        getUsersInRoom: function(room) {
+            return this.users.filter(user => user.room === room);
+        },
+        // checks if all users in a given Room have answered
+        haveAllUsersAnswered: function(room) {
+            const usersInRoom = this.getUsersInRoom(room);
+            return usersInRoom.every(user => user.answered);
+        }
+    };
+
+    const RoomsState = {
+        //array which saves the rooms
+        rooms: [],
+        // replaces rooms array with a new rooms array
+        setRooms: function(newRoomsArray) {
+            this.rooms = newRoomsArray;
+        },
+
+        //creates a room with its setting or updates a room and removes the room with the same name to don't have duplicate rooms
+        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer) {
+            const newRoom = {
+                room,
+                currentQuestion: currentQuestion || 0,
+                questionCount: questionCount,
+                category: category,
+                gameStatus: 'open',
+                timerEnabled: timerEnabled,
+                timer: timer,
+                playerAnswersArray: {}
+            };
+
+            this.setRooms([
+                ...this.rooms.filter(r => r.room !== room),
+                newRoom
+            ]);
+
+            return newRoom;
+        }
+    };
+
+
     function buildMsg(name, text){
         return {
             name,
@@ -148,6 +217,8 @@
     }
 
     module.exports = {
+        UsersState,
+        RoomsState,
         buildMsg,
         userLeavesApp,
         getUser,
