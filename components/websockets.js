@@ -17,7 +17,8 @@ const { buildMsg,
     const ADMIN = "Admin"
 
     //states
-
+    function multiPlayerQuiz(io) {
+        
     const UsersState = {
         //array which saves the users
         users: [],
@@ -85,8 +86,6 @@ const { buildMsg,
         }
     };
 
-
-function multiPlayerQuiz(io) {
     io.on('connection', socket => {
 
 
