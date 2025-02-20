@@ -82,7 +82,7 @@ const io = socketIo(httpServer,
       origin: 'https://rooflessjoe.github.io',
     }
   });
-const quizNamespace = io.of('/multi_quiz')
+const quizNamespace = io.of('/quizAPI')
 
 // WebSocket-Komponente initialisieren
 multiQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
