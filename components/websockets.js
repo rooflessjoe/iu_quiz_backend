@@ -1,7 +1,6 @@
 const queries = require ("./queries");
 const pool = require ("./pool");
-const { ADMIN,
-    UsersState,
+const { UsersState,
     RoomsState,
     buildMsg,
     userLeavesApp,
@@ -10,9 +9,10 @@ const { ADMIN,
     getAllActiveRooms,
     updateRoomAttribute,
     evaluateAnswer,
-    getCategories,
-    addUserToRoom,
-    userJoinsRoom } = require ("./websocketsFunc");
+    getCategories } = require ("./websocketsFunc");
+
+    //Variable for Message Function
+    const ADMIN = "Admin";
 
     pool.connect().then(() => console.log('Datenverbindung erfolgreich!')).catch((err) => console.error('Fehler bei der Verbindung:', err.stack));
 
@@ -375,6 +375,55 @@ const { ADMIN,
             }
         })
     })
+
+    async function addUserToRoom(socket, room, token) {
+        //checks if user is logged in
+        const decoded = await verifyToken(token);
+        console.log(decoded);
+        console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
+
+
+        // Remove user from previous room
+        const prevRoom = getUser(socket.id)?.room;
+        if (prevRoom) {
+            socket.leave(prevRoom);
+            io.to(prevRoom).emit('message', buildMsg(ADMIN, `${decoded.username} has left the room`));
+        }
+
+        // activate user in new room
+        const user = activateUser(socket.id, decoded.username, room);
+
+        //emit update list of users in Old room to the old room
+        if (prevRoom) {
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom),
+            });
+        }
+
+        // Add user to new room
+        socket.join(user.room);
+
+        return user;
+    }
+
+    async function userJoinsRoom(socket, user){
+        // Message to user that he joined a room
+        socket.emit('message', buildMsg(ADMIN, `You have joined the ${user.room} chat room`));
+
+        // Message to users in room that user joined
+        socket.broadcast.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has joined the room`));
+
+        // updates list of users in new room
+        io.to(user.room).emit('userList', {
+            users: getUsersInRoom(user.room),
+        });
+
+        // updates List of active rooms for all users
+        io.emit('roomList', {
+            rooms: getAllActiveRooms(),
+        });
+
+    }
 }
 
 module.exports = multiPlayerQuiz;
