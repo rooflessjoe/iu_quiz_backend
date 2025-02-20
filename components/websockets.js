@@ -118,9 +118,7 @@ module.exports = (io) => {
         // sends a list of categories from the Database to frontend
         //getCategories()
 
-        const query = `
-        SELECT DISTINCT quiz_name
-        from quiz`
+        const query = "SELECT DISTINCT quiz_name FROM quiz";
         
         const { categories } = pool.query(query);
         
