@@ -122,7 +122,7 @@ module.exports = (io) => {
         SELECT DISTINCT quiz_name
         from quiz`
         
-        const categories = pool.query(query);
+        const { categories } = pool.query(query);
         
         socket.emit('listOfCategories', categories);
 
