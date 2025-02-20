@@ -142,11 +142,8 @@
     //Function to evaluate the Answers
     //TODO: Überprüfen ob diese Funktion auch für SinglePlayer genutzt werden kann!
     async function evaluateAnswer(playerAnswer, question_id) {
-        console.log(playerAnswer);
-        console.log(question_id);
         try{
             const result = await pool.query(queries.answer_valid2, [question_id, playerAnswer]);
-            console.log(result);
             if(result.rows.length === 0){
                 return {correct : false, message: 'Ungültige Antwort'}
             }
