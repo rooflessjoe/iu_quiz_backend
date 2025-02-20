@@ -1,34 +1,40 @@
-// Importieren benötigter Module
+/**
+ * Express router providing Login and Registration related routes
+ * @module Login&Registration
+ * @requires module:PostgreSQL
+ */
+
+//Benötigte Module
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
-const { Pool } = require('pg');
+const pool = require('../components/pool');
 const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
+
 /**
- * Express Router
+ * Express router to mount login related functions on
+ * @type {object}
+ * @constant router
+ * @namespace loginRouter
  */
 const router = express.Router();
-
-/** 
- * PostgreSQL-Verbindung
- */
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
-
-//CORS
-//router.use(cors({ origin: cors_origin.origin_local }));
 
 // Registrierung der Middleware zur Verarbeitung von JSON Anfragen
 router.use(express.json());
 
 // Authentifiziert einen Benutzer und gibt ein JSON Web Token zurück.
+/**
+ * Route providing the login authentification for the web application
+ * @name post/login
+ * @async
+ * @function
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Object} JSON Web Token
+ * @memberof module:Login&Registration~loginRouter
+ * @inner
+ */
 router.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -56,21 +62,28 @@ router.post('/api/login', async (req, res) => {
 });
 
 // Registriert einen Benutzter durch speichern seiner Daten in der Datenbank; Passwort wird gehashed gespeichert
-router.post('/api/register', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  if (username.includes('@iu-study.org')){
-  try {
-      const result = await pool.query(queries.register,[username, hashedPassword]);
-      res.status(201).send(`User registered with ID: ${result.rows[0].id}`);
-  } catch (err) {
-    console.error(err);
-      res.status(500).send('Error registering user');
-  }
-} else res.status(403).send('Unathorized Domain');
-});
-
 /**
- * Export der Komponente für die main-Instanz in server.js
- */ 
+ * Route providing the registration for the web application
+ * @name post/login
+ * @async
+ * @function
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @memberof module:Login&Registration~loginRouter
+ * @inner
+ */
+router.post('/api/register', async (req, res) => {
+  const { email, username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    if (email.includes('@iu-study.org') || email.includes("@iubh.de")){
+    try {
+        const result = await pool.query(queries.register,[email, username, hashedPassword]);
+        res.status(201).send(`User registered with ID: ${result.rows[0].id}`);
+    } catch (err) {
+      console.error(err);
+        res.status(500).send('Error registering user');
+    }
+  } else res.status(403).send('Unathorized Domain');
+  });
+
 module.exports = router;

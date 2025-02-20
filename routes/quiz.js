@@ -1,30 +1,35 @@
-// Importieren benötigter Module
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
-const { authenticateToken } = require('../components/auth.js');
-const queries = require('../components/queries.json');
-//const cors_origin = require('../components/cors_origin.json');
 /**
- * Express Router
+ * Express router providing quiz related routes
+ * @module Quiz
+ * @requires module:JWT-Authentification
+ * @requires module:PostgreSQL
+ */
+
+//Benötigte Module
+const express = require('express');
+const pool = require('../components/pool');
+const authenticateToken = require('../components/auth.js');
+const queries = require('../components/queries.json');
+
+/**
+ * Express router to mount quiz related functions on
+ * @type {object}
+ * @const
+ * @namespace quizRouter
  */
 const router = express.Router();
 
-/** 
- * PostgreSQL-Verbindung
+/**
+ * Route serving the list of available quizes
+ * @name get/quiz_list
+ * @async
+ * @function
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Object}
+ * @memberof module:Quiz~quizRouter
+ * @inner
  */
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
-
-// CORS
-//router.use(cors({ origin: cors_origin.origin_local }));
-
-// Abfrage von Benutzerdaten aus der Datenbank.
 router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
   let client;
     try {
@@ -41,6 +46,18 @@ router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
     }
 });
 
+/**
+ * Route serving the list of questions in the selected quiz
+ * @name get/quiz
+ * @async
+ * @function
+ * @param {String} path - Needed Structure /api/quiz?quizID=[int]&quizName=[String]
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Object}
+ * @memberof module:Quiz~quizRouter
+ * @inner 
+ */
 router.get('/api/quiz', authenticateToken, async (req, res)  => {
     let client;
       try {
@@ -61,6 +78,18 @@ router.get('/api/quiz', authenticateToken, async (req, res)  => {
       }
   });
 
+/**
+ * Route serving the right answer to a question
+ * @name get/answer
+ * @async
+ * @function
+ * @param {String} path - Needed Structure /api/quiz?quizID=[int]&quizName=[String]&questionID=[int]
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Object}
+ * @memberof module:Quiz~quizRouter
+ * @inner 
+ */
 router.get('/api/answer', authenticateToken, async (req, res) => {
       let client;
       try {
@@ -77,7 +106,7 @@ router.get('/api/answer', authenticateToken, async (req, res) => {
       }
 });
 
-//TODO: Ausarbeiten
+/*//TODO
 router.post('/api/quiz/custom', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -96,9 +125,6 @@ router.post('/api/quiz/custom', async (req, res) => {
   } catch (err) {
       res.status(500).send('Error logging in');
   }
-});
+});*/
 
-/**
- * Export der Komponente für die main-Instanz in server.js
- */ 
 module.exports = router;

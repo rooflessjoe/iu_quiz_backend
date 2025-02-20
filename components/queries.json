@@ -1,10 +1,14 @@
 {
-    "quiz_list": "SELECT quiz_id, quiz_name FROM quiz",
+    "quiz_list": "SELECT DISTINCT quiz_name FROM quiz",
     "question_list": "SELECT f.question_id, f.question FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id WHERE q.quiz_id = $1 AND q.quiz_name = $2",
+    "question_count": "SELECT COUNT(*) AS count FROM questions WHERE quiz_id = (SELECT quiz_id FROM quiz WHERE quiz_name = $1)",
+    "question": "SELECT f.question_id, f.question FROM questions f JOIN quiz q ON f.quiz_id = q.quiz_id WHERE q.quiz_name = $1 ORDER BY RANDOM() LIMIT 1",
     "answer_list": "SELECT f.question_id, a.answer_id, a.answer FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id INNER JOIN answers a ON f.question_id = a.question_id WHERE q.quiz_id = $1 AND q.quiz_name = $2",
+    "answer_list2": "SELECT a.answer, a.question_id FROM answers a WHERE a.question_id = $1",
     "answer_valid": "SELECT a.answer_id, a.valid FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id INNER JOIN answers a ON f.question_id = a.question_id WHERE q.quiz_id = $1 AND q.quiz_name = $2 AND f.question_id = $3 AND a.valid = 'true'",
+    "answer_valid2": "SELECT valid FROM answers WHERE question_id = $1 AND answer_id = $2",
     "data": "SELECT name, email, username FROM users WHERE username = $1",
     "login": "SELECT username, password FROM users WHERE username = $1",
-    "register": "INSERT INTO users (name, email, username, password) VALUES ($1, $1, $1, $2) RETURNING id",
+    "register": "INSERT INTO users (name, email, username, password) VALUES ($1, $1, $2, $3) RETURNING id",
     "add_user_token": "INSERT INTO tokens (token) VALUES ($1)"
 }

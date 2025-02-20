@@ -1,28 +1,12 @@
 // Importieren benötigter Module
 const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
-const { authenticateToken } = require('../components/auth.js');
-const queries = require('../components/queries.json');
-//const cors_origin = require('../components/cors_origin.json');
+const pool = require('../components/pool');
+const authenticateToken = require('../components/auth');
+const queries = require('../components/queries');
 /**
  * Express Router
  */
 const router = express.Router();
-
-/** 
- * PostgreSQL-Verbindung
- */
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,  // Server stellt diese Umgebungsvariable bereit
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,  // Setze dies auf true für Produktionsumgebungen -> benötigt ein Zertifikat
-  }
-});
-
-// CORS
-//router.use(cors({ origin: cors_origin.origin_local }));
 
 // Abfrage von Benutzerdaten aus der Datenbank.#
 router.get('/api/data', authenticateToken, async (req, res)  => {
@@ -42,6 +26,7 @@ router.get('/api/data', authenticateToken, async (req, res)  => {
 });
 
 /**
+ * @module DataInterface
  * Export der Komponente für die main-Instanz in server.js
  */ 
 module.exports = router;
