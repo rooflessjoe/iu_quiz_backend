@@ -1,3 +1,4 @@
+    const { verifyToken } = require ("./auth");
     //function to build Messages with name, text and time
     function buildMsg(name, text){
         return {

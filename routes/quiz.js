@@ -8,7 +8,7 @@
 //Benötigte Module
 const express = require('express');
 const pool = require('../components/pool');
-const authenticateToken = require('../components/auth.js');
+const { authenticateToken }  = require('../components/auth.js');
 const queries = require('../components/queries.json');
 
 /**
