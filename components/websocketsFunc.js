@@ -1,8 +1,11 @@
     const { verifyToken } = require ("./auth");
     const pool = require ("./pool");
     const queries = require ("./queries");
-    //function to build Messages with name, text and time
+    
+    //Variable for Message Function
+    const ADMIN = "Admin";
 
+    //states
     const UsersState = {
         //array which saves the users
         users: [],
@@ -70,7 +73,7 @@
         }
     };
 
-
+    //function to build Messages with name, text and time
     function buildMsg(name, text){
         return {
             name,
@@ -219,6 +222,7 @@
     }
 
     module.exports = {
+        ADMIN,
         UsersState,
         RoomsState,
         buildMsg,

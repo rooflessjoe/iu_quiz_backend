@@ -1,6 +1,7 @@
 const queries = require ("./queries");
 const pool = require ("./pool");
-const { UsersState,
+const { ADMIN,
+    UsersState,
     RoomsState,
     buildMsg,
     userLeavesApp,
@@ -15,10 +16,6 @@ const { UsersState,
 
     pool.connect().then(() => console.log('Datenverbindung erfolgreich!')).catch((err) => console.error('Fehler bei der Verbindung:', err.stack));
 
-    //Variable for Message Function
-    const ADMIN = "Admin"
-
-    //states
     function multiPlayerQuiz(io) {
 
     io.on('connection', socket => {
