@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const authenticateToken = require("./auth");
+const verifyToken = require("./auth");
 
 module.exports = (io) => {
     const { Pool } = require('pg');
@@ -601,7 +601,7 @@ module.exports = (io) => {
 
     async function addUserToRoom(socket, room, token) {
         //checks if user is logged in
-        const decoded = await authenticateToken(token);
+        const decoded = await verifyToken(token);
         console.log(decoded);
         console.log(`User ${decoded.username} authenticated and entering room: ${room}`);
 
