@@ -1,7 +1,7 @@
 // Importieren benötigter Module
 const express = require('express');
 const pool = require('../components/pool');
-const authenticateToken = require('../components/auth');
+const { authenticateToken } = require('../components/auth');
 const queries = require('../components/queries');
 /**
  * Express Router
