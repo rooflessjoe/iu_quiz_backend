@@ -1,4 +1,5 @@
     const { verifyToken } = require ("./auth");
+    const pool = require ("./pool");
     //function to build Messages with name, text and time
 
     const UsersState = {
