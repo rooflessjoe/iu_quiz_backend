@@ -116,12 +116,15 @@ module.exports = (io) => {
         });
 
         // sends a list of categories from the Database to frontend
-        getCategories().then(categories => {
-            socket.emit('listOfCategories', categories);
-        }).catch(error => {
-            console.log(error);
-            socket.emit('listOfCategories', []);
-        })
+        //getCategories()
+
+        const query = `
+        SELECT DISTINCT quiz_name
+        from quiz`
+        
+        const categories = pool.query(query);
+        
+        socket.emit('listOfCategories', categories);
 
         // when user enters a room
         socket.on('enterRoom', async ({room, token}) => {
