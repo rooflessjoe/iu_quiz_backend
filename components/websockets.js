@@ -1,5 +1,6 @@
 const queries = require ("./queries");
 const pool = require ("./pool");
+const { verifyToken } = require("./auth");
 const { UsersState,
     RoomsState,
     buildMsg,
