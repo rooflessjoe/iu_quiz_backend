@@ -172,6 +172,7 @@
         UsersState,
         RoomsState,
         buildMsg,
+        activateUser,
         userLeavesApp,
         getUser,
         getUsersInRoom,
