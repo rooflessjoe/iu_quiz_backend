@@ -34,9 +34,11 @@ function authenticateToken(req, res, next) {
 }
 
 function verifyToken(token) {
+  console.log(token);
   return new Promise((resolve, reject) => {
       jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
           if (err) {
+            console.log(err);
               reject('Invalid token');
           }else{
               resolve(decoded);
