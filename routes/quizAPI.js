@@ -75,7 +75,7 @@ module.exports = (io) => {
         },
 
         //creates a room with its setting or updates a room and removes the room with the same name to don't have duplicate rooms
-        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer) {
+        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer, gameHost) {
             const newRoom = {
                 room,
                 currentQuestion: currentQuestion || 0,
@@ -84,7 +84,8 @@ module.exports = (io) => {
                 gameStatus: 'open',
                 timerEnabled: timerEnabled,
                 timer: timer,
-                playerAnswersArray: {}
+                playerAnswersArray: {},
+                gameHost: gameHost,
             };
 
             this.setRooms([
@@ -93,6 +94,10 @@ module.exports = (io) => {
             ]);
 
             return newRoom;
+        },
+        // Gets Room by Name
+        getRoom: function(roomName) {
+            return this.rooms.find(r => r.room === roomName) || null;
         }
     };
 
@@ -145,8 +150,11 @@ module.exports = (io) => {
                 }
 
                 // activates room with given parameters
-                RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer);
+                RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer, user.name);
 
+
+
+                console.log(RoomsState.rooms)
                 await userJoinsRoom(socket, user);
             }catch (error) {
                 //if token fails emit 'failedToken' and disconnect user from websocket
@@ -168,10 +176,16 @@ module.exports = (io) => {
                     new Error('User not found');
                 }
                 const room = RoomsState.rooms.find(r => r.room === user.room);
+                console.log(user.name)
+                console.log('Host is', room.gameHost)
+
                 if (!room) {
                     new Error('Room not found for the user');
                 }
 
+                if (room.gameHost !== user.name) {
+                    return
+                }
                 console.log(`Starting quiz in room: ${room.room}`);
 
                 // gets questions from Database
@@ -202,6 +216,7 @@ module.exports = (io) => {
                         timerDuration: room.timer,
                         question_id: questions[0].question_id,
                         question: questions[0].question,
+                        gameHost: room.gameHost,
                     });
                 } else {
                     console.log('No questions found for the category:', room.category);
@@ -354,42 +369,7 @@ module.exports = (io) => {
                 if (!user) {
                     new Error('User not found');
                 }
-
-                // removes user from room
-                const prevRoom = user.room;
-
-                if (prevRoom) {
-                    // leaves room without disconnecting from socket
-                    socket.leave(prevRoom);
-
-                    UsersState.setUsers(
-                        UsersState.users.filter(u => u.id !== socket.id)
-                    );
-
-                    // emit message to room that user left
-                    io.to(prevRoom).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
-
-                    // update userList in room
-                    io.to(prevRoom).emit('userList', {
-                        users: getUsersInRoom(prevRoom),
-                    });
-
-                    // inform user he left room
-                    socket.emit('message', buildMsg(ADMIN, `You have left the room`));
-                    socket.emit('leftRoom')
-
-
-                    // checks if room is empty after user left
-                    if(getUsersInRoom(prevRoom)  < 1){
-                        console.log('Room Empty')
-                        // removes room from RoomState if empty
-                        RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
-                    }
-                    //emits new activeRoom list
-                    io.emit('roomList', {
-                        rooms: getAllActiveRooms(),
-                    });
-                }
+                await userLeavesRoom(user, socket)
             } catch (err) {
                 console.error('Fehler', err.stack);
             }
@@ -405,27 +385,73 @@ module.exports = (io) => {
             }
         })
 
+        socket.on('skipQuestion', async () => {
+            try {
+                // finds user to find room
+                const user = getUser(socket.id);
+                if (!user) {
+                    new Error('User not found');
+                }
+                const room = RoomsState.rooms.find(r => r.room === user.room);
+                if (!room) {
+                    new Error('Room not found');
+                }
+                if (user.name === room.gameHost){
+                    // sets answered status for all players in room to false
+                    const usersInRoom = UsersState.getUsersInRoom(room.room);
+                    usersInRoom.forEach(u => UsersState.updateUserStatus(u.id, false));
+                    //checks if current question is under max questions for room
+                    if(room.currentQuestion < room.questionCount){
+                        // increases currentQuestion by 1, updates room
+                        const currentQuestionThisRound = room.currentQuestion + 1;
+                        const updates = {
+                            currentQuestion: currentQuestionThisRound
+                        };
+                        const updatedRoom = updateRoomAttribute(room.room, updates)
+
+                        // gets new question from Database
+                        const questions = await getQuestions(updatedRoom.category);
+
+                        // emits question to room
+                        io.to(updatedRoom.room).emit('question',{
+                            currentQuestion: currentQuestionThisRound,
+                            questionCount: room.questionCount,
+                            timerEnabled: room.timerEnabled,
+                            timerDuration: room.timer,
+                            question_id: questions[0].question_id,
+                            question: questions[0].question,
+                        })
+
+                    }else{
+                        // if max amount of question is reached ends game
+                        console.log('Game over')
+
+                        // gets score from all players in room and emits them to room
+                        const usersInRoom = getUsersInRoom(room.room)
+                        const userScores = usersInRoom.map(u => ({
+                            name: u.name,
+                            score: u.score
+                        }))
+                        const gameAnswersArray = room.playerAnswersArray;
+
+                        io.to(room.room).emit('quizOver', userScores, gameAnswersArray);
+                    }
+                }
+            }catch(err){
+                console.error('Fehler', err.stack)}
+        })
+
 
 
         // When user disconnects - to all others
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             //get user and execute function to leaveApp on disconnect
             const user = getUser(socket.id)
             userLeavesApp(socket.id)
 
             //if user exists
-            if(user){
-                //inform players in room user left
-                io.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has left the room`))
-
-                // emits new user in room list to room
-                io.to(user.room).emit('userList', {
-                    users: getUsersInRoom(user.room)
-                })
-                //emits new room list
-                io.emit('roomList', {
-                    rooms: getAllActiveRooms()
-                })
+            if (user) {
+                await userLeavesRoom(user, socket)
             }
             console.log(`User ${socket.id} disconnected from Chat`)
         })
@@ -643,7 +669,18 @@ module.exports = (io) => {
             rooms: getAllActiveRooms(),
         });
 
+        const room = RoomsState.getRoom(user.room);
+
+        const host = room.gameHost;
+        console.log('Room host:', host);
+
+        socket.emit('userJoinedRoom', {
+            roomName: user.room,
+            roomHost: host
+        })
+
     }
+
     async function getQuestionCountFromDB(category){
         const query = `
             SELECT COUNT(*) AS count
@@ -652,11 +689,69 @@ module.exports = (io) => {
                 SELECT quiz_id
                 FROM quiz
                 WHERE quiz_name = $1
-            );`
+                );`
         const result = await pool.query(query, [category]);
         console.log('Abgerufene Count:', result.rows[0].count);
         return result.rows[0].count;
 
 
+    }
+
+    async function userLeavesRoom(user, socket){
+        // removes user from room
+        const prevRoom = user.room;
+
+        if (prevRoom) {
+            // leaves room without disconnecting from socket
+            socket.leave(prevRoom);
+
+            UsersState.setUsers(
+                UsersState.users.filter(u => u.id !== socket.id)
+            );
+
+            // emit message to room that user left
+            io.to(prevRoom).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
+
+            // update userList in room
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom),
+            });
+
+            // inform user he left room
+            socket.emit('message', buildMsg(ADMIN, `You have left the room`));
+            socket.emit('leftRoom')
+
+            console.log(prevRoom)
+
+            // checks if room is empty after user left
+            if(getUsersInRoom(prevRoom)  < 1){
+                console.log('Room Empty')
+                // removes room from RoomState if empty
+                RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
+            }else{
+                // checks if use was host
+                const prevRoomObject = RoomsState.getRoom(prevRoom);
+                console.log(prevRoomObject);
+                if(prevRoomObject.gameHost === user.name){
+                    const usersInRoom = getUsersInRoom(prevRoom)
+                    console.log('Room:', usersInRoom);
+                    const firstUser = usersInRoom[0]
+                    console.log(firstUser);
+                    const newHost = {
+                        gameHost: firstUser.name
+                    }
+                    const updatedRoom = updateRoomAttribute(prevRoom , newHost);
+                    console.log('Udated Room', updatedRoom);
+                    io.to(prevRoom).emit('newHost', {
+                        gameHost: firstUser.name,
+                        gameStatus: prevRoomObject.gameStatus,
+                    })
+                }
+            }
+            //emits new activeRoom list
+            io.emit('roomList', {
+                rooms: getAllActiveRooms(),
+            });
+        }
     }
 }
