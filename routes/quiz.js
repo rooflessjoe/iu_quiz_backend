@@ -30,7 +30,7 @@ const router = express.Router();
  * @memberof module:Quiz~quizRouter
  * @inner
  */
-router.get('/api/quiz_list', authenticateToken, async (req, res)  => {
+router.get('/api/quiz_list', authenticateToken, async (res)  => {
   let client;
     try {
       client = await pool.connect(); // Verbindung reservieren
