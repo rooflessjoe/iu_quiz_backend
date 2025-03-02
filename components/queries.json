@@ -1,5 +1,5 @@
 {
-    "quiz_list": "SELECT DISTINCT quiz_name FROM quiz",
+    "quiz_list": "SELECT DISTINCT quiz_name FROM quiz ORDER BY quiz_name;",
     "question_list": "SELECT f.question_id, f.question FROM quiz q INNER JOIN questions f ON q.quiz_id = f.quiz_id WHERE q.quiz_id = $1 AND q.quiz_name = $2",
     "question_list2": "SELECT * FROM questions WHERE quiz_id = $1",
     "question_count": "SELECT COUNT(*) AS count FROM questions WHERE quiz_id = (SELECT quiz_id FROM quiz WHERE quiz_name = $1)",
