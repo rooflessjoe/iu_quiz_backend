@@ -62,8 +62,12 @@ router.get('/api/quiz', authenticateToken, async (req, res)  => {
     let client;
       try {
         client = await pool.connect(); // Verbindung reservieren
-        const questions = await pool.query(queries.question_list2, [req.query.quizID, req.query.quizName]);
-        const answers = await pool.query(queries.answer_list3, [req.query.quizID, req.query.quizName]);
+        //const questions = await pool.query(queries.question_list2, [req.query.quizID, req.query.quizName]);
+        const questions = await pool.query(queries.question_list2, [req.query.quizID]);
+        //const answers = await pool.query(queries.answer_list3, [req.query.quizID, req.query.quizName]);
+        const answers = await pool.query(queries.answer_list3);
+        console.log(questions);
+        console.log(answers);
         res.json({
           questions: questions.rows,
           answers: answers.rows
