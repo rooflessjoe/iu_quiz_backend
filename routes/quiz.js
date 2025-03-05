@@ -98,7 +98,7 @@ router.post('/api/answer', authenticateToken, async (req, res) => {
       try {
         client = await pool.connect(); // Verbindung reservieren
         const result = await pool.query(queries.answer_valid2, [question, answer]);
-        res.json(result.rows[0]);
+        res.json(result.rows[0].valid);
       } catch (err) {
         console.error(err);
         res.status(500).send('Fehler beim Abrufen der Daten');
