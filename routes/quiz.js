@@ -92,12 +92,13 @@ router.get('/api/quiz', authenticateToken, async (req, res)  => {
  * @memberof module:Quiz~quizRouter
  * @inner 
  */
-router.get('/api/answer', authenticateToken, async (req, res) => {
+router.post('/api/answer', authenticateToken, async (req, res) => {
+      const { question, answer } = req.body;
       let client;
       try {
         client = await pool.connect(); // Verbindung reservieren
-        const result = await pool.query(queries.answer_valid, [req.query.quizID, req.query.quizName, req.query.questionID]);
-        res.json(result.rows);
+        const result = await pool.query(queries.answer_valid2, [question, answer]);
+        res.json(result);
       } catch (err) {
         console.error(err);
         res.status(500).send('Fehler beim Abrufen der Daten');
