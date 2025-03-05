@@ -92,7 +92,7 @@ router.get('/api/quiz', authenticateToken, async (req, res)  => {
  * @memberof module:Quiz~quizRouter
  * @inner 
  */
-router.post('/api/answer', authenticateToken, async (req, res) => {
+router.get('/api/answer', authenticateToken, async (req, res) => {
       const { question, answer } = req.body;
       let client;
       try {
