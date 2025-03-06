@@ -48,7 +48,7 @@
         },
 
         //creates a room with its setting or updates a room and removes the room with the same name to don't have duplicate rooms
-        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer) {
+        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer, gameHost) {
             const newRoom = {
                 room,
                 currentQuestion: currentQuestion || 0,
@@ -57,7 +57,8 @@
                 gameStatus: 'open',
                 timerEnabled: timerEnabled,
                 timer: timer,
-                playerAnswersArray: {}
+                playerAnswersArray: {},
+                gameHost: gameHost
             };
 
             this.setRooms([
@@ -66,6 +67,10 @@
             ]);
 
             return newRoom;
+        },
+        // Gets Room by Name
+        getRoom: function(roomName) {
+            return this.rooms.find(r => r.room === roomName) || null;
         }
     };
 
@@ -168,6 +173,64 @@
         }
     }
 
+    async function userLeavesRoom(user, socket){
+        // removes user from room
+        const prevRoom = user.room;
+
+        if (prevRoom) {
+            // leaves room without disconnecting from socket
+            socket.leave(prevRoom);
+
+            UsersState.setUsers(
+                UsersState.users.filter(u => u.id !== socket.id)
+            );
+
+            // emit message to room that user left
+            io.to(prevRoom).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
+
+            // update userList in room
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom),
+            });
+
+            // inform user he left room
+            socket.emit('message', buildMsg(ADMIN, `You have left the room`));
+            socket.emit('leftRoom')
+
+            console.log(prevRoom)
+
+            // checks if room is empty after user left
+            if(getUsersInRoom(prevRoom)  < 1){
+                console.log('Room Empty')
+                // removes room from RoomState if empty
+                RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
+            }else{
+                // checks if use was host
+                const prevRoomObject = RoomsState.getRoom(prevRoom);
+                console.log(prevRoomObject);
+                if(prevRoomObject.gameHost === user.name){
+                    const usersInRoom = getUsersInRoom(prevRoom)
+                    console.log('Room:', usersInRoom);
+                    const firstUser = usersInRoom[0]
+                    console.log(firstUser);
+                    const newHost = {
+                        gameHost: firstUser.name
+                    }
+                    const updatedRoom = updateRoomAttribute(prevRoom , newHost);
+                    console.log('Udated Room', updatedRoom);
+                    io.to(prevRoom).emit('newHost', {
+                        gameHost: firstUser.name,
+                        gameStatus: prevRoomObject.gameStatus,
+                    })
+                }
+            }
+            //emits new activeRoom list
+            io.emit('roomList', {
+                rooms: getAllActiveRooms(),
+            });
+        }
+    }
+
     module.exports = {
         UsersState,
         RoomsState,
@@ -179,5 +242,6 @@
         getAllActiveRooms,
         updateRoomAttribute,
         evaluateAnswer,
-        getCategories
+        getCategories,
+        userLeavesRoom
     };
