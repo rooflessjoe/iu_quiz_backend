@@ -11,8 +11,7 @@ const { UsersState,
     getAllActiveRooms,
     updateRoomAttribute,
     evaluateAnswer,
-    getCategories,
-    userLeavesRoom } = require ("./websocketsFunc");
+    getCategories } = require ("./websocketsFunc");
 
     //Variable for Message Function
     const ADMIN = "Admin";
@@ -451,6 +450,64 @@ const { UsersState,
             rooms: getAllActiveRooms(),
         });
 
+    }
+
+    async function userLeavesRoom(user, socket){
+        // removes user from room
+        const prevRoom = user.room;
+
+        if (prevRoom) {
+            // leaves room without disconnecting from socket
+            socket.leave(prevRoom);
+
+            UsersState.setUsers(
+                UsersState.users.filter(u => u.id !== socket.id)
+            );
+
+            // emit message to room that user left
+            io.to(prevRoom).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
+
+            // update userList in room
+            io.to(prevRoom).emit('userList', {
+                users: getUsersInRoom(prevRoom),
+            });
+
+            // inform user he left room
+            socket.emit('message', buildMsg(ADMIN, `You have left the room`));
+            socket.emit('leftRoom')
+
+            console.log(prevRoom)
+
+            // checks if room is empty after user left
+            if(getUsersInRoom(prevRoom)  < 1){
+                console.log('Room Empty')
+                // removes room from RoomState if empty
+                RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
+            }else{
+                // checks if use was host
+                const prevRoomObject = RoomsState.getRoom(prevRoom);
+                console.log(prevRoomObject);
+                if(prevRoomObject.gameHost === user.name){
+                    const usersInRoom = getUsersInRoom(prevRoom)
+                    console.log('Room:', usersInRoom);
+                    const firstUser = usersInRoom[0]
+                    console.log(firstUser);
+                    const newHost = {
+                        gameHost: firstUser.name
+                    }
+                    const updatedRoom = updateRoomAttribute(prevRoom , newHost);
+                    console.log('Udated Room', updatedRoom);
+                    io.to(prevRoom).emit('newHost', {
+                        gameHost: firstUser.name,
+                        gameStatus: prevRoomObject.gameStatus,
+                    })
+                }
+            }
+            //emits new activeRoom list
+            io.emit('roomList', {
+                rooms: getAllActiveRooms(),
+            });
+        }
     }
 }
 
