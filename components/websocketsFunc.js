@@ -55,6 +55,7 @@
                 questionCount: questionCount,
                 category: category,
                 gameStatus: 'open',
+                roomStatus: 'open',
                 timerEnabled: timerEnabled,
                 timer: timer,
                 playerAnswersArray: {},
