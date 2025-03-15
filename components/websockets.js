@@ -351,7 +351,7 @@ const { UsersState,
         socket.on('privateRoom', async () => {
             try {
                 // sets gameState to active
-                const roomState = 'open'
+                const roomState = 'closed'
 
                 // find user to find the room
                 const user = getUser(socket.id);
@@ -388,20 +388,39 @@ const { UsersState,
 
         socket.on('unPrivateRoom', async () => {
             try {
-                //find user
+                // sets gameState to active
+                const roomState = 'open'
+
+                // find user to find the room
                 const user = getUser(socket.id);
                 if (!user) {
                     new Error('User not found');
                 }
+                const room = RoomsState.rooms.find(r => r.room === user.room);
+                if (!room) {
+                    new Error('Room not found for the user');
+                }
 
+                if (room.gameHost !== user.name) {
+                    return
+                }
+
+                console.log(`Starting quiz in room: ${room.room}`);
+
+                //creates an update object and updates the room with new gameStatus and currentQuestion
                 const updates = {
                     roomStatus: roomState
                 };
+                updateRoomAttribute(room.room, updates)
 
-                await userLeavesRoom(user, socket);
+                // emits new Room list to all clients
+                io.emit('roomList', {
+                    rooms: getAllActiveRooms(),
+                });
 
             } catch (err) {
-                console.error('Fehler', err.stack);
+                console.error('Fehler:', err.stack);
+                throw err;
             }
         });
 
