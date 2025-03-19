@@ -1,5 +1,5 @@
     const pool = require ("./pool");
-    const queries = require ("./queries");
+    //const queries = require ("./queries");
 
     //states
     const UsersState = {
@@ -149,7 +149,7 @@
     //TODO: Überprüfen ob diese Funktion auch für SinglePlayer genutzt werden kann!
     async function evaluateAnswer(playerAnswer, question_id) {
         try{
-            const result = await pool.query(queries.answer_valid2, [question_id, playerAnswer]);
+            const result = await pool.query(global.queries.answer_valid2, [question_id, playerAnswer]);
             if(result.rows.length === 0){
                 return {correct : false, message: 'Ungültige Antwort'}
             }
@@ -165,7 +165,7 @@
     //returns a list of Categories from the Database
     async function getCategories(){
         try{
-            const { rows } = await pool.query(queries.quiz_list);
+            const { rows } = await pool.query(global.queries.quiz_list);
             console.log('Abgerufene Categories:', rows);
             return rows.map(({quiz_name}) => quiz_name);
         }catch (err){

@@ -9,7 +9,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../components/pool');
-const queries = require('../components/queries.json');
+//const queries = require('../components/queries.json');
 //const cors_origin = require('../components/cors_origin.json');
 
 /**
@@ -77,7 +77,7 @@ router.post('/api/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     if (email.includes('@iu-study.org') || email.includes("@iubh.de")){
     try {
-        const result = await pool.query(queries.register,[email, username, hashedPassword]);
+        const result = await pool.query(global.queries.register,[email, username, hashedPassword]);
         res.status(201).send(`User registered with ID: ${result.rows[0].id}`);
     } catch (err) {
       console.error(err);

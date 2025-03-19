@@ -1,4 +1,4 @@
-const queries = require ("./queries");
+//const queries = require ("./queries");
 const pool = require ("./pool");
 const { verifyToken } = require("./auth");
 const { UsersState,
@@ -101,7 +101,7 @@ const { UsersState,
                 console.log(`Starting quiz in room: ${room.room}`);
 
                 // gets questions from Database
-                const result = await pool.query(queries.question, [room.category])
+                const result = await pool.query(global.queries.question, [room.category])
                 const questions = result.rows;
 
                 // increases current question for room
@@ -153,7 +153,7 @@ const { UsersState,
                 }
 
                 // database request to get the Answers for the Question
-                const result = await pool.query(queries.answer_list2, [question_id])
+                const result = await pool.query(global.queries.answer_list2, [question_id])
                 const answers = result.rows;
 
                 //if Answers found emit to room
@@ -240,7 +240,7 @@ const { UsersState,
                         const updatedRoom = updateRoomAttribute(room.room, updates)
 
                         // gets new question from Database
-                        const result = await pool.query(queries.question, [room.category])
+                        const result = await pool.query(global.queries.question, [room.category])
                         const questions = result.rows;
 
                         // emits question to room
@@ -428,7 +428,7 @@ const { UsersState,
             try {
                 console.log(category);
                 //const count = await getQuestionCountFromDB(category);
-                const result = await pool.query(queries.question_count, [category]);
+                const result = await pool.query(global.queries.question_count, [category]);
                 socket.emit('questionCountForCategory', {count: result.rows[0].count});
             }catch (err){
                 console.error('Fehler', err.stack)
