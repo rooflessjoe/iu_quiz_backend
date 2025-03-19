@@ -10,7 +10,13 @@ const express = require('express');
 const cors = require('cors');
 const {Pool} = require('pg');
 const fs = require('fs');
-const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
+require('dotenv').config();
+
+global.queries = JSON.parse(process.env.QUERIES_JSON);
+
+console.log(global.queries);
+
+//const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
 //Für Websockets
 const http = require('http');
@@ -32,14 +38,14 @@ const multiPlayerQuiz = require('./components/websockets')
  * @returns {String} Inhalt der Datei.
  * @memberof module:Server~secretKey
  */
-const secretKey = fs.readFileSync(path, 'utf8').trim();
+//const secretKey = fs.readFileSync(path, 'utf8').trim();
 
 /**
  * Umgebungsvariable für den geheimen Schlüssel auf dem Server
  * @name SECRET_KEY
  * @memberof module:Server~secretKey
  */
-process.env.SECRET_KEY = secretKey;
+//process.env.SECRET_KEY = secretKey;
 
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
