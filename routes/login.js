@@ -38,7 +38,7 @@ router.use(express.json());
 router.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-      const result = await pool.query(queries.login, [username]);
+      const result = await pool.query(global.queries.login, [username]);
       const user = result.rows[0];
       
       // bcrypt.compare vergleicht das gehashte Passwort in der Datenbank mit dem übergebenen Passwort in Klartext
