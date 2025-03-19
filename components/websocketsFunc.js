@@ -48,18 +48,25 @@
         },
 
         //creates a room with its setting or updates a room and removes the room with the same name to don't have duplicate rooms
-        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer, gameHost) {
+        activateRoom: function(room, currentQuestion, questionCount, category, timerEnabled, timer, gameHost, privateRoomEnabled, privateRoomPassword) {
+            let roomStatus;
+            if (privateRoomEnabled) {
+                roomStatus = 'private'
+            } else {
+                roomStatus = 'open'
+            }
             const newRoom = {
                 room,
                 currentQuestion: currentQuestion || 0,
                 questionCount: questionCount,
                 category: category,
                 gameStatus: 'open',
-                roomStatus: 'open',
+                roomStatus: roomStatus,
                 timerEnabled: timerEnabled,
                 timer: timer,
                 playerAnswersArray: {},
-                gameHost: gameHost
+                gameHost: gameHost,
+                privateRoomPassword: privateRoomPassword
             };
 
             this.setRooms([

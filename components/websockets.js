@@ -57,7 +57,7 @@ const { UsersState,
         });
 
         // when user creates a room
-        socket.on('createRoom', async ({token, questionCount, category, room, timerEnabled, timer}) => {
+        socket.on('createRoom', async ({token, questionCount, category, room, timerEnabled, timer, privateRoomEnabled, privateRoomPassword}) => {
             try{
                 const user = await addUserToRoom(socket, room, token)
 
@@ -65,9 +65,12 @@ const { UsersState,
                 if (!timerEnabled){
                     timer = null;
                 }
+                if (!privateRoomEnabled){
+                    privateRoomPassword = null;
+                }
 
                 // activates room with given parameters
-                RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer, user.name);
+                RoomsState.activateRoom(room, 0, questionCount, category, timerEnabled, timer, user.name, privateRoomEnabled, privateRoomPassword);
 
                 await userJoinsRoom(socket, user);
             }catch (error) {
@@ -348,81 +351,81 @@ const { UsersState,
             }
         });
 
-        socket.on('privateRoom', async () => {
-            try {
-                // sets gameState to active
-                const roomState = 'closed'
-
-                // find user to find the room
-                const user = getUser(socket.id);
-                if (!user) {
-                    new Error('User not found');
-                }
-                const room = RoomsState.rooms.find(r => r.room === user.room);
-                if (!room) {
-                    new Error('Room not found for the user');
-                }
-
-                if (room.gameHost !== user.name) {
-                    return
-                }
-
-                console.log(`Starting quiz in room: ${room.room}`);
-
-                //creates an update object and updates the room with new gameStatus and currentQuestion
-                const updates = {
-                    roomStatus: roomState
-                };
-                updateRoomAttribute(room.room, updates)
-
-                // emits new Room list to all clients
-                io.emit('roomList', {
-                    rooms: getAllActiveRooms(),
-                });
-
-            } catch (err) {
-                console.error('Fehler:', err.stack);
-                throw err;
-            }
-        });
-
-        socket.on('unPrivateRoom', async () => {
-            try {
-                // sets gameState to active
-                const roomState = 'open'
-
-                // find user to find the room
-                const user = getUser(socket.id);
-                if (!user) {
-                    new Error('User not found');
-                }
-                const room = RoomsState.rooms.find(r => r.room === user.room);
-                if (!room) {
-                    new Error('Room not found for the user');
-                }
-
-                if (room.gameHost !== user.name) {
-                    return
-                }
-
-                console.log(`Starting quiz in room: ${room.room}`);
-
-                //creates an update object and updates the room with new gameStatus and currentQuestion
-                const updates = {
-                    roomStatus: roomState
-                };
-                updateRoomAttribute(room.room, updates)
-
-                // emits new Room list to all clients
-                io.emit('roomList', {
-                    rooms: getAllActiveRooms(),
-                });
-
-            } catch (err) {
-                console.error('Fehler:', err.stack);
-                throw err;
-            }
-        });
+        // socket.on('privateRoom', async () => {
+        //     try {
+        //         // sets gameState to active
+        //         const roomState = 'closed'
+        //
+        //         // find user to find the room
+        //         const user = getUser(socket.id);
+        //         if (!user) {
+        //             new Error('User not found');
+        //         }
+        //         const room = RoomsState.rooms.find(r => r.room === user.room);
+        //         if (!room) {
+        //             new Error('Room not found for the user');
+        //         }
+        //
+        //         if (room.gameHost !== user.name) {
+        //             return
+        //         }
+        //
+        //         console.log(`Starting quiz in room: ${room.room}`);
+        //
+        //         //creates an update object and updates the room with new gameStatus and currentQuestion
+        //         const updates = {
+        //             roomStatus: roomState
+        //         };
+        //         updateRoomAttribute(room.room, updates)
+        //
+        //         // emits new Room list to all clients
+        //         io.emit('roomList', {
+        //             rooms: getAllActiveRooms(),
+        //         });
+        //
+        //     } catch (err) {
+        //         console.error('Fehler:', err.stack);
+        //         throw err;
+        //     }
+        // });
+        //
+        // socket.on('unPrivateRoom', async () => {
+        //     try {
+        //         // sets gameState to active
+        //         const roomState = 'open'
+        //
+        //         // find user to find the room
+        //         const user = getUser(socket.id);
+        //         if (!user) {
+        //             new Error('User not found');
+        //         }
+        //         const room = RoomsState.rooms.find(r => r.room === user.room);
+        //         if (!room) {
+        //             new Error('Room not found for the user');
+        //         }
+        //
+        //         if (room.gameHost !== user.name) {
+        //             return
+        //         }
+        //
+        //         console.log(`Starting quiz in room: ${room.room}`);
+        //
+        //         //creates an update object and updates the room with new gameStatus and currentQuestion
+        //         const updates = {
+        //             roomStatus: roomState
+        //         };
+        //         updateRoomAttribute(room.room, updates)
+        //
+        //         // emits new Room list to all clients
+        //         io.emit('roomList', {
+        //             rooms: getAllActiveRooms(),
+        //         });
+        //
+        //     } catch (err) {
+        //         console.error('Fehler:', err.stack);
+        //         throw err;
+        //     }
+        // });
 
         socket.on('getQuestionCount', async ({category})=>{
             try {
