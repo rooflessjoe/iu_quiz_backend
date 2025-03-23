@@ -1,47 +1,67 @@
+/**
+ * @module Server
+ * @requires Login&Registration
+ * @requires Quiz
+ * @requires Websockets
+ */
+
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
+require('dotenv').config();
 
-/** 
- * Liest den geheimen Schlüssel aus der geheimen Datei auf dem Server
- */ 
-const secretKey = fs.readFileSync(path, 'utf8').trim();
+global.queries = JSON.parse(process.env.QUERIES_JSON);
 
-/** 
- * Umgebungsvariable für den geheimen Schlüssel auf dem Server
- */ 
-process.env.SECRET_KEY = secretKey;
+//Für Websockets
+const http = require('http');
+const socketIo = require('socket.io');
+const multiPlayerQuiz = require('./components/websockets')
 
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
-const dataRouter = require('./routes/data');
+const quizRouter = require('./routes/quiz');
 
-/**
- * Server; 
- * Mit dem Express-Framework initialisiert.
- */ 
+//Server; Mit dem Express-Framework initialisiert.
 const server = express();
 server.disable('x-powered-by');
 
 /**
  * Server Port;
  * Wird entweder aus der Umgebungsvariable oder manuell festgelegt.
- */ 
+ * @constant {int} port
+ */
 const port = process.env.PORT || 3000;  // Render stellt die PORT-Variable bereit
 
-
-
 // CORS
+/**
+ * Globale Middleware für CORS
+ * @name useCors
+ * @function
+ * @param {Object} options - Die CORS-Optionen
+ * @param {String} options.origin - Die erlaubte Ursprungs-URL
+ * @memberof module:Server
+ */
 server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 
 // Initialisieren von Komponenten
 server.use(loginRouter);
-//server.use(userRouter);
-server.use(dataRouter);
+server.use(quizRouter);
+
+// HTTP-Server erstellen und mit Socket.io verbinden
+const httpServer = http.createServer(server);
+const io = socketIo(httpServer, 
+  {
+    cors: 
+    {
+      origin: 'https://rooflessjoe.github.io',
+    }
+  });
+const quizNamespace = io.of('/quizAPI');
+
+// WebSocket-Komponente initialisieren
+multiPlayerQuiz(quizNamespace); // Die WebSocket-Logik hier aufrufen
 
 // Ausgabe vom Server
-server.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });
