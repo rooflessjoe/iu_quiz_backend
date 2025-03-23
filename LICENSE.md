@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) [2025] [Emil Sajkevic, Thomas Schmitt, Niklas Geldbachl, Nino Segler]
+Copyright (c) [2025] [Emil Sajkevic, Niklas Geldbach, Thomas Schmitt, Nino Segler]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
