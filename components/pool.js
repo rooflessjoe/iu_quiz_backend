@@ -1,6 +1,6 @@
 /** 
  * Middleware für PostgreSQL-Datenbankverbindung
- * @module PostgreSQL
+ * @module PostgreSQL-Middleware
  */
 
 const {Pool} = require('pg');

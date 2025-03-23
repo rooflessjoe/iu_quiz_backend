@@ -1,7 +1,7 @@
 /**
  * Middleware zur Authentifizierung eines JSON Web Tokens (JWT).
  * Überprüft den Authorization-Header und validiert den Token.
- * @module JWT-Authentification
+ * @module Authentification-Middleware
 */
 
 const jwt = require('jsonwebtoken');
@@ -33,6 +33,11 @@ function authenticateToken(req, res, next) {
   next();
 }
 
+/**
+ * @function verifyToken
+ * @param {Object} token - The JWT token to verify.
+ * @returns {Promise<Object>} A promise that resolves with the decoded token object if valid, or rejects with an error message if invalid.
+*/
 function verifyToken(token) {
   return new Promise((resolve, reject) => {
       jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {

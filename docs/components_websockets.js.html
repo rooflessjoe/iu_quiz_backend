@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/websockets.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/websockets.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Websockets-Modul für Multiplayer
  * @module Websockets
  * @requires module:Authentification-Middleware
@@ -89,7 +117,7 @@ const { UsersState,
          * @param {Object} data - The data object containing room and token.
          * @param {string} data.room - The name of the room.
          * @param {string} data.token - The JWT token for user authentication.
-         * @returns {Promise<void>} A promise that resolves when the user has entered the room and all updates are complete..
+         * @returns {Promise&lt;void>} A promise that resolves when the user has entered the room and all updates are complete..
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -119,7 +147,7 @@ const { UsersState,
         * @param {number|null} data.timer - The timer duration, or null if the timer is not enabled.
         * @param {boolean} data.privateRoomEnabled - Whether the room is private.
         * @param {string|null} data.privateRoomPassword - The password for the private room, or null if the room is not private.
-        * @returns {Promise<void>} A promise that resolves when the room is created and the user has joined the room.
+        * @returns {Promise&lt;void>} A promise that resolves when the room is created and the user has joined the room.
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -151,7 +179,7 @@ const { UsersState,
          * Handles the event when a quiz starts.
          * @function
          * @name StartsQuiz
-         * @returns {Promise<void>} A promise that resolves when the quiz has started and all updates are complete.
+         * @returns {Promise&lt;void>} A promise that resolves when the quiz has started and all updates are complete.
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -223,7 +251,7 @@ const { UsersState,
          * @name askForAnswers
          * @param {Object} data - The data object containing the question ID.
          * @param {number} data.question_id - The ID of the question to fetch answers for.
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -264,7 +292,7 @@ const { UsersState,
          * @param {Object} data - The data object containing the player's answer and question ID.
          * @param {string} data.playerAnswer - The answer provided by the player.
          * @param {number} data.question_id - The ID of the question being answered.
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -315,7 +343,7 @@ const { UsersState,
          * Advances to the next question if all players have answered, or ends the game if the maximum number of questions is reached.
          * @function
          * @name nextQuestion
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -339,7 +367,7 @@ const { UsersState,
                     usersInRoom.forEach(u => UsersState.updateUserStatus(u.id, false));
 
                     //checks if current question is under max questions for room
-                    if(room.currentQuestion < room.questionCount){
+                    if(room.currentQuestion &lt; room.questionCount){
                         // increases currentQuestion by 1, updates room
                         const currentQuestionThisRound = room.currentQuestion + 1;
                         const updates = {
@@ -390,7 +418,7 @@ const { UsersState,
          * Skips the current question if the user is the game host, and advances to the next question or ends the game if the maximum number of questions is reached.
          * @function
          * @name skipQuestion
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -410,7 +438,7 @@ const { UsersState,
                     const usersInRoom = UsersState.getUsersInRoom(room.room);
                     usersInRoom.forEach(u => UsersState.updateUserStatus(u.id, false));
                     //checks if current question is under max questions for room
-                    if(room.currentQuestion < room.questionCount){
+                    if(room.currentQuestion &lt; room.questionCount){
                         // increases currentQuestion by 1, updates room
                         const currentQuestionThisRound = room.currentQuestion + 1;
                         const updates = {
@@ -455,7 +483,7 @@ const { UsersState,
          * Handles the user leaving the room.
          * @function
          * @name leaveRoom
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -481,7 +509,7 @@ const { UsersState,
          * @name getQuestionCount
          * @param {Object} data - The data object containing the category.
          * @param {string} data.category - The category to get the question count for.
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -503,7 +531,7 @@ const { UsersState,
          * Handles user disconnection, executing necessary functions to leave the app and room.
          * @function
          * @name disconnect
-         * @returns {Promise<void>}
+         * @returns {Promise&lt;void>}
          * @memberof module:Websockets~multiPlayerQuiz~Connection
          * @inner
          */
@@ -565,7 +593,7 @@ const { UsersState,
  * @param {Object} socket - The socket object representing the user's connection.
  * @param {string} room - The name of the room to add the user to.
  * @param {string} token - The JWT token for user authentication.
- * @returns {Promise<Object>} A promise that resolves to the user object.
+ * @returns {Promise&lt;Object>} A promise that resolves to the user object.
  * @throws {Error} Throws an error if the token verification fails.
  * @memberof module:Websockets~multiPlayerQuiz
  * @inner
@@ -604,7 +632,7 @@ const { UsersState,
  * 
  * @param {Object} socket - The socket object representing the user's connection.
  * @param {Object} user - The user object containing user details.
- * @returns {Promise<void>} A promise that resolves when the user has joined the room and all updates are complete.
+ * @returns {Promise&lt;void>} A promise that resolves when the user has joined the room and all updates are complete.
  * @memberof module:Websockets~multiPlayerQuiz
  * @inner
  */
@@ -638,7 +666,7 @@ const { UsersState,
  * 
  * @param {Object} user - The user object containing user details.
  * @param {Object} socket - The socket object representing the user's connection.
- * @returns {Promise<void>} A promise that resolves when the user has left the room and all updates are complete.
+ * @returns {Promise&lt;void>} A promise that resolves when the user has left the room and all updates are complete.
  * @memberof module:Websockets~multiPlayerQuiz
  * @inner
  */
@@ -669,7 +697,7 @@ const { UsersState,
             console.log(prevRoom)
 
             // checks if room is empty after user left
-            if(getUsersInRoom(prevRoom)  < 1){
+            if(getUsersInRoom(prevRoom)  &lt; 1){
                 console.log('Room Empty')
                 // removes room from RoomState if empty
                 RoomsState.setRooms(RoomsState.rooms.filter(r => r.room !== prevRoom));
@@ -701,4 +729,26 @@ const { UsersState,
     }
 }
 
-module.exports = multiPlayerQuiz;
+module.exports = multiPlayerQuiz;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Authentification-Middleware.html">Authentification-Middleware</a></li><li><a href="module-Login&Registration.html">Login&Registration</a></li><li><a href="module-PostgreSQL-Middleware.html">PostgreSQL-Middleware</a></li><li><a href="module-Quiz.html">Quiz</a></li><li><a href="module-Server.html">Server</a></li><li><a href="module-Websockets.html">Websockets</a></li><li><a href="module-Websockets-Functions.html">Websockets-Functions</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-Login&Registration-loginRouter.html">loginRouter</a></li><li><a href="module-Quiz-quizRouter.html">quizRouter</a></li><li><a href="module-Websockets-Functions-RoomsState.html">RoomsState</a></li><li><a href="module-Websockets-Functions-UsersState.html">UsersState</a></li><li><a href="module-Websockets-multiPlayerQuiz.html">multiPlayerQuiz</a></li><li><a href="module-Websockets-multiPlayerQuiz-Connection.html">Connection</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 23 2025 11:23:55 GMT+0100 (Mitteleuropäische Normalzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

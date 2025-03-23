@@ -8,46 +8,17 @@
 // Importieren benötigter Module
 const express = require('express');
 const cors = require('cors');
-const {Pool} = require('pg');
-const fs = require('fs');
 require('dotenv').config();
 
 global.queries = JSON.parse(process.env.QUERIES_JSON);
-
-//const path = '/etc/secrets/secret_key'; // Pfad zur geheimen Datei auf dem Server
 
 //Für Websockets
 const http = require('http');
 const socketIo = require('socket.io');
 const multiPlayerQuiz = require('./components/websockets')
 
-/**
- * Geheimer Schlüssel aus der geheimen Datei auf dem Server
- * @constant {String} secretKey
- * @namespace secretKey
- */
- 
-/**
- * Liest den geheimen Schlüssel aus der Datei auf dem Server
- * @name readFileSync
- * @function
- * @param {String} path - internal path on server for read file
- * @param {String} encoding - Zeichenkodierung, die verwendet werden soll.
- * @returns {String} Inhalt der Datei.
- * @memberof module:Server~secretKey
- */
-//const secretKey = fs.readFileSync(path, 'utf8').trim();
-
-/**
- * Umgebungsvariable für den geheimen Schlüssel auf dem Server
- * @name SECRET_KEY
- * @memberof module:Server~secretKey
- */
-//process.env.SECRET_KEY = secretKey;
-
 // Importieren von Komponenten
 const loginRouter = require('./routes/login');
-//const dataRouter = require('./routes/data');
 const quizRouter = require('./routes/quiz');
 
 //Server; Mit dem Express-Framework initialisiert.
@@ -75,7 +46,6 @@ server.use(cors({ origin: 'https://rooflessjoe.github.io' }));
 // Initialisieren von Komponenten
 server.use(loginRouter);
 server.use(quizRouter);
-//server.use(dataRouter);
 
 // HTTP-Server erstellen und mit Socket.io verbinden
 const httpServer = http.createServer(server);
