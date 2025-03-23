@@ -73,7 +73,7 @@ router.post('/api/login', async (req, res) => {
 router.post('/api/register', async (req, res) => {
   const { email, username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    if (email.includes('@iu-study.org') || email.includes("@iubh.de")){
+    if (email.includes('@iu-study.org') || email.includes("@iubh.de") || email.includes("@iu.org")){
     try {
         const result = await pool.query(global.queries.register,[email, username, hashedPassword]);
         res.status(201).send(`User registered with ID: ${result.rows[0].id}`);
