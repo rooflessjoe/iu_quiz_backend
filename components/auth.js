@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 /**
  * Middleware zur Authentifizierung eines JSON Web Tokens (JWT).
  * Überprüft den Authorization-Header und validiert den Token.
